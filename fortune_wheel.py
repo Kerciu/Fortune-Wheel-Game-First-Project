@@ -56,5 +56,19 @@ def introduction():
 
     return player1, player2, player3
 
+# def hidden_password(password):
+#     hidden_word = '-' * len(password)
+#     print(f"Ukryte hasło:\n{hidden_word}")
+
+#     consonants = set('bcdfghjklmnpqrstvwxyz')
+#     revealed_letters = set()
+
+#     while '_' in hidden_word:
+#         guess = input("Podaj spółgłoskę: ").lower()
+        
+
+
+password = ['Kazakhstan', 'Poland', 'Ukraine', 'Republic of Korea']
+chosen_password = random.choices(password)
 # prizes = [100, 200, 500, 1000, 1500, 2000, 2500, 3000]
 # print(fortune_wheel(prizes))
