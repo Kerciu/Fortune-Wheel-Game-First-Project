@@ -6,10 +6,14 @@ class Player:
 
     :param points: Player's points, deafults to 0
     :type points: int
+
+    :param prizes: Player's prizes, deafults to None
+    :type prizes: str
     """
-    def __init__(self, nickname, points=0):
+    def __init__(self, nickname, points=0, prizes=None):
         self._nickname = nickname
         self._points = points
+        self._prizes = prizes
 
     def nickname(self):
         return self._nickname
@@ -22,6 +26,12 @@ class Player:
     
     def set_points(self, new_points):
         return self._points == new_points
+    
+    def prizes(self):
+        return self._prizes
+    
+    def set_prizes(self, new_prizes):
+        return self._prizes == new_prizes
 
     def info(self):
         name = self._nickname

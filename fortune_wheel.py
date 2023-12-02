@@ -56,16 +56,39 @@ def introduction():
 
     return player1, player2, player3
 
-# def hidden_password(password):
-#     hidden_word = '-' * len(password)
-#     print(f"Ukryte hasło:\n{hidden_word}")
+def hidden_password(password):
+    hidden_word = ''
+    for char in password:
+        if char.isalpha():
+            hidden_word += '-'
+        else:
+            hidden_word += char
+    print(f"Ukryte hasło:\n{hidden_word}")
 
-#     consonants = set('bcdfghjklmnpqrstvwxyz')
-#     revealed_letters = set()
+    consonants = set('bcdfghjklmnpqrstvwxyz')
 
-#     while '_' in hidden_word:
-#         guess = input("Podaj spółgłoskę: ").lower()
+    while '-' in hidden_word:
+        guess = input("Podaj spółgłoskę: ").lower()
+
+        if len(guess) != 1 or guess not in consonants:
+            print("Podana wartość nie jest spółgłoską")
+            continue
         
+        found = False
+        for i, letters in enumerate(password):
+            if guess == any(letters):
+                hidden_word = hidden_word[:i] + letters + hidden_word[i+1:]
+                found = True
+
+        if found:
+            print(f"Zgadłeś! Litera {guess} znajduje się w haśle!")
+        else:
+            print(f"Niestety litera {guess} nie znajduje się w haśle!") 
+    
+        print(f"Ukryte hasło:\n{hidden_word}")
+
+    print("Gratulacje! Odgadłeś całe hasło!")
+    return hidden_word
 
 
 password = ['Kazakhstan', 'Poland', 'Ukraine', 'Republic of Korea']
