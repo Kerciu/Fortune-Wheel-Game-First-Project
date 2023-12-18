@@ -1,3 +1,11 @@
+class WrongWordError(Exception):
+    pass
+
+
+class WrongCategoryError(Exception):
+    pass
+
+
 class Player:
     """
     Class Players: Contains attributes:
@@ -17,48 +25,46 @@ class Player:
 
     def nickname(self):
         return self._nickname
-    
+
     def points(self):
         return self._points
-    
-    def set_nickname(self, new_nickname):
-        return self._nickname == new_nickname
-    
-    def set_points(self, new_points):
-        return self._points == new_points
-    
+
     def prizes(self):
         return self._prizes
-    
+
+    def set_nickname(self, new_nickname):
+        self._nickname = new_nickname
+
+    def add_points(self, new_points):
+        self._points += new_points
+
     def set_prizes(self, new_prizes):
-        return self._prizes == new_prizes
+        self._prizes = new_prizes
 
     def info(self):
         name = self._nickname
         exception_points = 'point' if self._points == 1 else 'points'
         return f"{name.capitalize()} has {self._points} {exception_points}."
-    
+
     def __str__(self):
         return self.info()
-    
-class Game:
-    def __init__(self, player, points):
-        self.player = player
-        self.enemies = points
-        self._result = None
 
-    # def play(self, rounds):
-    #     print('Starting the game')
-    #     for round in range(1, rounds + 1):
-    #         print(f'Round: {round}')
-    #         target, damage, status = self.player.attack(self.enemies)
-    #         if target:
-    #             if status:
-    #                 print(f'{target.name()} took {damage} points of damage.')
-    #                 if not target.is_alive():
-    #                     print(f'{target.name()} died.')
-    #                     self.enemies.remove(target)
-    #                 else:
-    #                     print(f'{target.name()} escaped')
-    #     self._result = bool(self.enemies)
-    #     return self._result
+
+class WordAndCategory:
+    """
+    Class WordAndCategory: Contains attributes:
+    :param word: Shown password to guess
+    :type word: str
+
+    :param category: Shown category to guess
+    :type category: str
+    """
+    def __init__(self, word, category):
+        if not isinstance(word, str):
+            e = "Slowo do odgadniecia musi byc w formacie string!"
+            raise WrongWordError(e)
+        self._word = word
+        if not isinstance(category, str):
+            e = "Kategoria musi być w formacie string!"
+            raise WrongCategoryError(e)
+        self._category = category
