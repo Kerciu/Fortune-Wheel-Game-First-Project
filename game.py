@@ -1,13 +1,22 @@
 import fortune_wheel
-from players import Player
-import time
 
 
 def main():
-    fortune_wheel.introduction()
-    time.sleep(3)
-    fortune_wheel.clear_terminal()
-    fortune_wheel.inform_players()
+    players = fortune_wheel.introduction()
+    words_and_categories = fortune_wheel.load_from_json()
+
+    while True:
+        fortune_wheel.play_round(words_and_categories, players)
+        fortune_wheel.inform_players(players)
+        restart = input("Czy chcesz zagrać jeszcze raz? (tak/nie): ").lower()
+        if restart != 'tak':
+            break
+
+    print("Dziękujemy za grę!")
+    # fortune_wheel.introduction()
+    # time.sleep(3)
+    # fortune_wheel.clear_terminal()
+    # fortune_wheel.inform_players()
 
     # players = fortune_wheel.introduction()
     # words_and_categories = fortune_wheel.load_from_json()

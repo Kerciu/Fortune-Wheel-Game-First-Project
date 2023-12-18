@@ -18,10 +18,11 @@ class Player:
     :param prizes: Player's prizes, deafults to None
     :type prizes: str
     """
-    def __init__(self, nickname, points=0, prizes=None):
+    def __init__(self, nickname, points=0, perm_points=0, prizes=None):
         self._nickname = nickname
         self._points = points
-        self._prizes = prizes
+        self._perm_points = perm_points
+        self._prizes = [] if not prizes else prizes
 
     def nickname(self):
         return self._nickname
@@ -29,22 +30,31 @@ class Player:
     def points(self):
         return self._points
 
+    def perm_points(self):
+        return self._perm_points
+
     def prizes(self):
         return self._prizes
 
     def set_nickname(self, new_nickname):
         self._nickname = new_nickname
 
+    def add_perm_points(self, new):
+        self._perm_points += new
+
     def add_points(self, new_points):
         self._points += new_points
 
-    def set_prizes(self, new_prizes):
-        self._prizes = new_prizes
+    def remove_points(self, new_points):
+        self._points -= new_points
+
+    def add_prizes(self, new_prizes):
+        self._prizes.append(new_prizes)
 
     def info(self):
-        name = self._nickname
+        nickname = self._nickname
         exception_points = 'point' if self._points == 1 else 'points'
-        return f"{name.capitalize()} has {self._points} {exception_points}."
+        return f"{nickname.capitalize()} has {self._points} {exception_points}."
 
     def __str__(self):
         return self.info()
@@ -68,3 +78,9 @@ class WordAndCategory:
             e = "Kategoria musi być w formacie string!"
             raise WrongCategoryError(e)
         self._category = category
+
+    def word(self):
+        return self._word
+
+    def category(self):
+        return self._category
