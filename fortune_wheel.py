@@ -114,20 +114,19 @@ def center_text(text):
         return ' ' * char_len
 
 
-def guess_full_password(players, word):
+def guess_full_password(event, players, word):
     clear_terminal()
-    print("Wprowadź hasło lub naciśnij enter by kontynuować: ")
-    full_guess = input().lower()
-    active_player_index = 0
-    while full_guess != word.lower():
-        print("Niestety, nie zgadłeś! Kolej na następnego gracza")
-        active_player_index = (active_player_index + 1) % len(players)
-        player = players[active_player_index]
-        print(f"Kolej na gracza: {player.name()}")
-        print("Wprowadź hasło lub naciśnij enter aby kontynuować: ")
+    if event.name == '9':
+        print("Wprowadź hasło lub naciśnij enter by kontynuować: ")
         full_guess = input().lower()
-    name = players[active_player_index].name()
-    print(f"Gratulacje! Hasło odgadnięte przez gracza {name}!")
+        for player in players:
+            if full_guess in word.lower():
+                print(f"Gratulację graczu {player.name()}. Odgadłeś hasło.")
+                return
+        print("Niestety, to nieprawidłowe hasło. Kolej na następnego gracza.")
+        time.sleep(2)  # Dodatkowe opóźnienie dla czytelności komunikatu
+        clear_terminal()
+        return
 
 
 def play_round(list_of_words_and_categ, players):
@@ -159,8 +158,8 @@ def play_round(list_of_words_and_categ, players):
                     'Skórzana galanteria', 'Wok', 'Zegarek Szwajcarski',
                     'Sprzet audio', 'Pobyt w spa']
 
-        fortune_wheel(prizes)
-        choice = random.choice(prizes)
+        choice = fortune_wheel(prizes)
+        choice
         if choice == 'BANKRUT':
             player.points() == 0
             player = players[active_player + 1]
@@ -191,10 +190,32 @@ def play_round(list_of_words_and_categ, players):
                     else:
                         print("Nieprawidłowa wartość")
                         continue
+        print("Odgadnij hasło! Naciśnij '9' i wprowadź hasło:")
         key = guess_full_password(players, word)
         keyboard.on_press_key('9', lambda event: key)
         # Reszta kodu logiki gry
+
+        consonants = set('bcdfghjklmnpqrstvwxyz')
+        while '-' in hidden_word:
+            guess = input("Podaj spółgłoskę: ").lower()
+            if len(guess) != 1 or guess not in consonants:
+                print("Podana wartość nie jest spółgłoską")
+                continue
+
+            found = False
+            for i, letters in enumerate(word):
+                if guess in letters:
+                    hidden_word = hidden_word[:i] + letters + hidden_word[i+1:]
+                    found = True
+            if found:
+                print(f"Zgadłeś! Litera {guess} znajduje się w haśle!")
+            else:
+                print(f"Niestety litera {guess} nie znajduje się w haśle!")
+                player = players[active_player + 1]
+                break
+
         keyboard.unhook_all()
+        active_player = (active_player + 1) % len(players)
 
 
 def inform_players(players):
