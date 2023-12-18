@@ -14,16 +14,16 @@ def test_player_object_creation(monkeypatch):
     assert isinstance(player3, Player)
 
 
-def test_player_name_creation(monkeypatch):
-    player_name = 'Janusz'
-    monkeypatch.setattr('builtins.input', lambda _: player_name)
+def test_player_nickname_creation(monkeypatch):
+    player_nickname = 'Janusz'
+    monkeypatch.setattr('builtins.input', lambda _: player_nickname)
     player1, _, _ = introduction()
-    assert player1.nickname() == player_name
+    assert player1.nicknickname() == player_nickname
 
 
-def test_player_nickname():
+def test_player_nicknickname():
     player = Player('Gerwazy', 200)
-    assert player.nickname() == 'Gerwazy'
+    assert player.nicknickname() == 'Gerwazy'
 
 
 def test_player_points():

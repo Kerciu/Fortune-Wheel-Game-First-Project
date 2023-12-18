@@ -1,9 +1,9 @@
 from players import Player
 
 
-def test_player_nickname():
+def test_player_nicknickname():
     player = Player('Gerwazy', 200)
-    assert player.nickname() == 'Gerwazy'
+    assert player.nicknickname() == 'Gerwazy'
 
 
 def test_player_points():
