@@ -2,7 +2,7 @@ import random
 import time
 import os
 import json
-import keyboard
+# import keyboard
 from players import Player, WordAndCategory
 
 
@@ -79,19 +79,22 @@ def center_text(text):
         return ' ' * char_len
 
 
-def guess_full_password(event, players, word):
+def guess_full_password(players, word):
     clear_terminal()
-    if event.name == '9':
-        print("Wprowadź hasło lub naciśnij enter by kontynuować: ")
-        full_guess = input().lower()
-        for player in players:
-            if full_guess in word.lower():
-                print(f"Gratulację graczu {player.name()}. Odgadłeś hasło.")
-                return
+    print("Wprowadź hasło lub naciśnij enter by kontynuować: ")
+    full_guess = input().lower()
+
+    correct_guess = False
+    for player in players:
+        if full_guess == word.lower():
+            correct_guess = True
+            print(f"Gratulacje, {player.nickname()}! Odgadłeś/aś hasło: {word}!")
+            return True
+    if not correct_guess:
         print("Niestety, to nieprawidłowe hasło. Kolej na następnego gracza.")
         time.sleep(2)  # Dodatkowe opóźnienie dla czytelności komunikatu
         clear_terminal()
-        return
+    return False
 
 
 def check_guessed_letter(word, hidden_word, guessed_letter, prizes):
@@ -138,7 +141,7 @@ def play_round(list_of_words_and_categ, players):
         choice = fortune_wheel(prizes)
         choice
         if choice == 'BANKRUT':
-            player.points() == 0
+            player.remove_points(player.points())
             player = players[active_player + 1]
         elif choice == 'NIESPODZIANKA':
             random_surprise = random.choice(surprise)
@@ -171,9 +174,6 @@ def play_round(list_of_words_and_categ, players):
                 else:
                     print("Nieprawidłowa wartość")
                     continue
-        print("Odgadnij hasło! Naciśnij '9' i wprowadź hasło:")
-        key = guess_full_password(players, word)
-        keyboard.on_press_key('9', lambda event: key)
         # Reszta kodu logiki gry
 
         consonants = set('bcdfghjklmnpqrstvwxyz')
@@ -186,12 +186,17 @@ def play_round(list_of_words_and_categ, players):
             hidden_word, points = check_guessed_letter(word, hidden_word, guess, prizes)
             if points > 0:
                 print(f"Zgadłeś! Litera {guess} znajduje się w haśle!")
+                player.add_points(choice)
             else:
                 print(f"Niestety litera {guess} nie znajduje się w haśle!")
                 player = players[active_player + 1]
                 break
+
+            if guess_full_password(players, word):
+                round_over = True  # Jeśli hasło zostało odgadnięte, zakończ rundę
+
         while True:
-            choice_input = input(f"Co chcesz teraz zrobić, graczu {player.name()}?\n"
+            choice_input = input(f"Co chcesz teraz zrobić, graczu {player.nickname()}?\n"
                     "1. Zakręć ponownie kołem\n"
                     "2. Kup samogłoskę\n"
                     "3. Spróbuj odgadnąć hasło\n"
@@ -237,12 +242,9 @@ def play_round(list_of_words_and_categ, players):
                     time.sleep(2)  # Dodatkowe opóźnienie dla czytelności komunikatu
                     clear_terminal()
                     player = players[(active_player + 1) % len(players)]
-
             else:
                 print("Niepoprawne wejście, wybierz 1, 2 lub 3")
                 continue
-
-        keyboard.unhook_all()
         active_player = (active_player + 1) % len(players)
 
 
