@@ -125,7 +125,7 @@ def play_round(list_of_words_and_categ, players):
             hidden_word += char
 
     while not round_over:
-        info = f"Kolej gracza {player.nickname()}\nKategoria: {category}\nUkryte hasło:\n{hidden_word}"
+        info = f"Kategoria: {category}\nUkryte hasło:\n{hidden_word}"
         print(info)
         time.sleep(3)
         player = players[active_player]
