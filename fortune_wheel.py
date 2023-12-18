@@ -61,41 +61,6 @@ def introduction():
     return players
 
 
-def hidden_password(password):
-    hidden_word = ''
-    for char in password:
-        if char.isalpha():
-            hidden_word += '-'
-        else:
-            hidden_word += char
-    print(f"Ukryte hasło:\n{hidden_word}")
-
-    consonants = set('bcdfghjklmnpqrstvwxyz')
-
-    while '-' in hidden_word:
-        guess = input("Podaj spółgłoskę: ").lower()
-
-        if len(guess) != 1 or guess not in consonants:
-            print("Podana wartość nie jest spółgłoską")
-            continue
-
-        found = False
-        for i, letters in enumerate(password):
-            if guess in letters:
-                hidden_word = hidden_word[:i] + letters + hidden_word[i+1:]
-                found = True
-
-        if found:
-            print(f"Zgadłeś! Litera {guess} znajduje się w haśle!")
-        else:
-            print(f"Niestety litera {guess} nie znajduje się w haśle!")
-
-        print(f"Ukryte hasło:\n{hidden_word}")
-
-    print("Gratulacje! Odgadłeś całe hasło!")
-    return hidden_word
-
-
 def load_from_json():
     word_and_category_list = []
     with open('hasla.json', 'r', encoding='utf-8') as f:
@@ -127,6 +92,18 @@ def guess_full_password(event, players, word):
         time.sleep(2)  # Dodatkowe opóźnienie dla czytelności komunikatu
         clear_terminal()
         return
+
+
+def check_guessed_letter(word, hidden_word, guessed_letter, prizes):
+    if guessed_letter in word:
+        print(f"Zgadłeś! Litera {guessed_letter} znajduje się w haśle")
+        for i, letter in enumerate(word):
+            if letter == guessed_letter:
+                hidden_word = hidden_word[:1] + guessed_letter + hidden_word[i + 1:]
+        points = random.choice(prizes)
+        print(f"Zdobyłeś {points} punktów!")
+        return hidden_word, points
+    return hidden_word, 0
 
 
 def play_round(list_of_words_and_categ, players):
@@ -202,17 +179,35 @@ def play_round(list_of_words_and_categ, players):
                 print("Podana wartość nie jest spółgłoską")
                 continue
 
-            found = False
-            for i, letters in enumerate(word):
-                if guess in letters:
-                    hidden_word = hidden_word[:i] + letters + hidden_word[i+1:]
-                    found = True
-            if found:
+            hidden_word, points = check_guessed_letter(word, hidden_word, guess, prizes)
+            if points > 0:
                 print(f"Zgadłeś! Litera {guess} znajduje się w haśle!")
             else:
                 print(f"Niestety litera {guess} nie znajduje się w haśle!")
                 player = players[active_player + 1]
                 break
+        while True:
+            choice_input = input("Co chcesz teraz zrobić?\n"
+                    "1. Zakręć ponownie kołem\n"
+                    "2. Kup samogłoskę\n"
+                    "3. Spróbuj odgadnąć hasło\n"
+                    "Wybierz opcję: ")
+            if choice_input == 1:
+                print("Koło się kręci ponownie...")
+                time.sleep(1)
+                break
+            elif choice_input == 2:
+                #Logika kupowania samogłoski
+                #Aktualizacja stanu gracza
+                break
+            elif choice_input == 3:
+                #Logika odgadnięcia hasła
+                #Zakończenie rundy, wygrana, punkty, itp.
+                round_over=True
+                break
+            else:
+                print("Niepoprawne wejście, wybierz 1, 2 lub 3")
+                continue
 
         keyboard.unhook_all()
         active_player = (active_player + 1) % len(players)
