@@ -36,7 +36,7 @@ def fortune_wheel(choices):
     # Opóźnienie przed wyświetleniem wyniku i wyczyszczenie terminala
     time.sleep(1)
     clear_terminal()
-    return f'Wylosowana karta to: {picked_up_prize}'
+    return picked_up_prize
 
 
 def introduction():
@@ -97,16 +97,17 @@ def guess_full_password(players, word):
     return False
 
 
-def check_guessed_letter(word, hidden_word, guessed_letter, prizes):
+def check_guessed_letter(word, hidden_word, guessed_letter, points):
     if guessed_letter in word:
         print(f"Zgadłeś! Litera {guessed_letter} znajduje się w haśle")
         for i, letter in enumerate(word):
             if letter == guessed_letter:
                 hidden_word = hidden_word[:i] + guessed_letter + hidden_word[i + 1:]
-        points = random.choice(prizes)
         print(f"Zdobyłeś {points} punktów!")
         return hidden_word, points
-    return hidden_word, 0
+    else:
+        print("Ups! Nie udało się! Kolejka przechodzi na kolejnego gracza")
+        return hidden_word, 0
 
 
 def play_round(list_of_words_and_categ, players):
@@ -127,12 +128,12 @@ def play_round(list_of_words_and_categ, players):
     while not round_over:
         info = f"Kategoria: {category}\nUkryte hasło:\n{hidden_word}"
         print(info)
-        time.sleep(3)
+        time.sleep(2)
         player = players[active_player]
         print(f"Kolej na gracza {player.nickname()}")
-        time.sleep(3)
+        time.sleep(2)
         print("Kręcenie kołem fortuny...")
-        time.sleep(3)
+        time.sleep(2)
 
         prizes = [550, 350, 400, 1500, 'BANKRUT', 300, '500?',
                   'NIESPODZIANKA', 150, 200, 100, 400, 250, 450, 2500, 'STOP']
@@ -141,8 +142,8 @@ def play_round(list_of_words_and_categ, players):
                     'Sprzet audio', 'Pobyt w spa']
 
         choice = fortune_wheel(prizes)
-        print(f'Wylosowano {choice}')
-        time.sleep(3)
+        print(f'Wylosowano: {choice}')
+        time.sleep(1)
         if isinstance(choice, int):
             print(f"Otrzymane punkty: {choice}")
             player.add_points(choice)
@@ -155,7 +156,6 @@ def play_round(list_of_words_and_categ, players):
             random_surprise = random.choice(surprise)
             prizes.remove('NIESPODZIANKA')
             player.prizes().append(random_surprise)
-            continue
         elif choice == 'STOP':
             player = active_player = (active_player + 1) % len(players)
             continue
@@ -172,6 +172,7 @@ def play_round(list_of_words_and_categ, players):
                         print("Kolejka przechodzi na następnego gracza...")
                         player.remove_points(player.points())
                         player = players[(active_player + 1) % len(players)]
+                        break
                     else:
                         player.add_points(3000)
                         print("Gratulacje, udało ci się zdobyć 3000 zł !")
@@ -188,20 +189,18 @@ def play_round(list_of_words_and_categ, players):
         consonants = set('bcdfghjklmnpqrstvwxyz')
         while '-' in hidden_word:
             print(info)
-            guess = input("Podaj spółgłoskę: ").lower()
+            guess = input(f"Kolej gracza {player.nickname()}, podaj spółgłoskę: ").lower()
             if len(guess) != 1 or guess not in consonants:
                 print("Podana wartość nie jest spółgłoską")
                 continue
 
-            hidden_word, points = check_guessed_letter(word, hidden_word, guess, prizes)
+            hidden_word, points = check_guessed_letter(word, hidden_word, guess, choice)
             if points > 0:
                 player.add_points(points)
-            else:
-                active_player = (active_player + 1) % len(players)
                 break
-
-            if guess_full_password(players, word):
-                round_over = True  # Jeśli hasło zostało odgadnięte, zakończ rundę
+            else:
+                player = player[(active_player + 1) % len(players)]
+                break
 
         while True:
             choice_input = input(f"Co chcesz teraz zrobić, graczu {player.nickname()}?\n"
@@ -211,7 +210,7 @@ def play_round(list_of_words_and_categ, players):
                     "Wybierz opcję: ")
             if choice_input == '1':
                 print("Koło się kręci ponownie...")
-                time.sleep(1)
+                time.sleep(2)
                 break
             elif choice_input == '2':
                 while True:
@@ -236,24 +235,19 @@ def play_round(list_of_words_and_categ, players):
                                 player.remove_points(price_for_vowel)
                                 print(f"Zakupiłeś samogłoskę '{vowel}'. Nowe ukryte hasło:\n{hidden_word}")
                                 break
-                break
             elif choice_input == '3':
                 print("Wybrałeś opcję odgadnięcia pełnego hasła!")
-                full_guess = input("Twoja odpowiedź: ").lower()
-                if full_guess in word.lower():
-                    print(f"Gratulacje, {player.nickname()}! Odgadłeś/aś hasło: {word}!")
+                guess = guess_full_password(players, word)
+                if guess:
+                    time.sleep(2)
                     for player in players:
                         player.add_perm_points(player.points())
-                    round_over = True
+                        round_over = True
                 else:
-                    print("Niestety, to nieprawidłowe hasło. Kolej na następnego gracza.")
-                    time.sleep(2)  # Dodatkowe opóźnienie dla czytelności komunikatu
-                    clear_terminal()
                     player = players[(active_player + 1) % len(players)]
             else:
                 print("Niepoprawne wejście, wybierz 1, 2 lub 3")
                 continue
-        active_player = (active_player + 1) % len(players)
 
 
 def inform_players(players):
