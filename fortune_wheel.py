@@ -289,6 +289,17 @@ def play_round(list_of_words_and_categ, players):
                 continue
 
 
+def winner(players):
+    return max(players, key=lambda player: player.perm_points())
+
+
+def final_round(list_of_words_and_categ, winner):
+    random_instance = random.choice(list_of_words_and_categ)
+    word = random_instance.word()
+    category = random_instance.category()
+    pass
+
+
 def inform_players(players):
     terminal_height = 24
     print('\n' * terminal_height - 3)
