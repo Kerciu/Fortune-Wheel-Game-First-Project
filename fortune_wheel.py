@@ -99,11 +99,11 @@ def guess_full_password(players, word):
 
 def update_hidden_word(word, hidden_word, guessed_letter):
     updated_hidden_word = ''
-    for i, letter in enumerate(word):
+    for i, (letter, hidden_char) in enumerate(zip(word, hidden_word)):
         if letter == guessed_letter and guessed_letter not in 'aeiou':
             updated_hidden_word += guessed_letter
         else:
-            updated_hidden_word += hidden_word[i]
+            updated_hidden_word += hidden_char if hidden_char != '-' else '-'
     return updated_hidden_word
 
 
@@ -124,16 +124,6 @@ def check_guessed_letter(word, hidden_word, guessed_letter, points):
     else:
         print("Ups! Nie udało się! Kolejka przechodzi na kolejnego gracza")
         return hidden_word, 0
-    # if guessed_letter in word:
-    #     print(f"Zgadłeś! Litera {guessed_letter} znajduje się w haśle")
-    #     for i, letter in enumerate(word):
-    #         if letter == guessed_letter:
-    #             partly_hidden_word = hidden_word[:i] + guessed_letter + hidden_word[i + 1:]
-    #     print(f"Zdobyłeś {points} punktów!")
-    #     return partly_hidden_word, points
-    # else:
-    #     print("Ups! Nie udało się! Kolejka przechodzi na kolejnego gracza")
-    #     return hidden_word, 0
 
 
 def check_guessed_vowel(word, hidden_word, guessed_vowel):
@@ -174,6 +164,7 @@ def play_round(list_of_words_and_categ, players):
     while not round_over:
         info = f"Kategoria: {category}\nUkryte hasło:\n{hidden_word}"
         print(info)
+        inform_players(players)
         time.sleep(2)
         player = players[active_player]
         print(f"Kolej na gracza {player.nickname()}")
@@ -203,8 +194,8 @@ def play_round(list_of_words_and_categ, players):
             random_surprise = random.choice(surprise)
             prizes.remove('NIESPODZIANKA')
             player.prizes().append(random_surprise)
-            print(f'Wylosowana niespodzianka to... {random_surprise}')
-            choice = 0
+            print(f'Wylosowana niespodzianka to... {random_surprise}\nDo tego zdobyłeś 50 punktów.')
+            choice = 50
         elif choice == 'STOP':
             active_player = (active_player + 1) % len(players)
             player = players[active_player]
@@ -256,19 +247,18 @@ def play_round(list_of_words_and_categ, players):
 
                 partly_hidden_word, points = check_guessed_letter(word, hidden_word, guess, choice)
                 if points > 0:
-                    hidden_word = partly_hidden_word
                     player.add_points(points)
+                    updated_hidden_word = update_hidden_word(word, hidden_word, guess)
+                    hidden_word = updated_hidden_word
+                    print(f"Zaktualizowane hasło: {hidden_word}")
                     break
                 else:
-                    hidden_word = hidden_word
                     active_player = (active_player + 1) % len(players)
                     player = players[active_player]
                     break
             else:
                 print("Podana wartość nie jest spółgłoską, spróbuj ponownie.")
                 continue
-        hidden_word = update_hidden_word(word, hidden_word, guess)
-        print(f"Zaktualizowane hasło: {hidden_word}")
 
         while True:
             time.sleep(3)
@@ -344,7 +334,6 @@ def final_round(list_of_words_and_categ, winner):
     word = random_instance.word()
     category = random_instance.category()
     pass
-
 
 
 def inform_players(players):
