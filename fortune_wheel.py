@@ -81,6 +81,7 @@ def center_text(text):
 
 def guess_full_password(players, word):
     clear_terminal()
+    print("Wybrałeś opcję odgadnięcia pełnego hasła!")
     print("Wprowadź hasło lub naciśnij enter by kontynuować: ")
     full_guess = input().lower()
 
@@ -191,12 +192,14 @@ def play_round(list_of_words_and_categ, players):
                         active_player = (active_player + 1) % len(players)
                         player = players[active_player]
                         choice = 0
+                        break
                     else:
                         player.add_points(3000)
                         print("Gratulacje, udało ci się zdobyć 3000 zł !")
                         active_player = (active_player + 1) % len(players)
                         player = players[active_player]
                         choice = 3000
+                        break
                 elif decision == '2':
                     player.add_points(500)
                     print("Dodano 500 zl do twojego konta")
@@ -275,18 +278,21 @@ def play_round(list_of_words_and_categ, players):
                             print("Wybrana samogłoska nie znajduje się w haśle.")
                             break
             elif choice_input == '3':
-                print("Wybrałeś opcję odgadnięcia pełnego hasła!")
+                info = f"Kategoria: {category}\nUkryte hasło:\n{hidden_word}"
+                print(info)
                 guess = guess_full_password(players, word)
                 if guess:
                     time.sleep(2)
-                    active_player.add_perm_points(active_player.points())
+                    player.add_perm_points(player.points())
                     round_over = True
+                    return True
                 else:
                     active_player = (active_player + 1) % len(players)
                     player = players[active_player]
             else:
                 print("Niepoprawne wejście, wybierz 1, 2 lub 3")
                 continue
+    return False
 
 
 def winner(players):
@@ -298,6 +304,7 @@ def final_round(list_of_words_and_categ, winner):
     word = random_instance.word()
     category = random_instance.category()
     pass
+
 
 
 def inform_players(players):
