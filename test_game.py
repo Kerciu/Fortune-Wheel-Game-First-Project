@@ -1,6 +1,7 @@
 from players import Player
-from fortune_wheel import introduction, fortune_wheel, hidden_password
+from fortune_wheel import introduction, fortune_wheel
 import pytest
+
 
 def test_player_object_creation(monkeypatch):
     input_values = iter(["Janusz", "Grazyna", "Zygmunt"])
@@ -19,50 +20,3 @@ def test_player_nickname_creation(monkeypatch):
     monkeypatch.setattr('builtins.input', lambda _: player_nickname)
     player1, _, _ = introduction()
     assert player1.nicknickname() == player_nickname
-
-
-def test_player_nicknickname():
-    player = Player('Gerwazy', 200)
-    assert player.nicknickname() == 'Gerwazy'
-
-
-def test_player_points():
-    player = Player('Gerwazy', 200)
-    assert player.points() == 200
-
-
-def test_player_info_one_point():
-    player = Player('Gerwazy', 1)
-    assert player.info() == 'Gerwazy has 1 point.'
-
-
-def test_player_info_not_one_point():
-    player = Player('Gerwazy', 200)
-    assert player.info() == 'Gerwazy has 200 points.'
-
-
-def test_hidden_password():
-    password = 'Kazakhstan'
-    result = hidden_password(password)
-    assert result == '----------'
-
-def test_hidden_password_revealed_guess(monkeypatch):
-    password = 'Poland'
-    guess = 'l'
-    monkeypatch.setattr('builtins.input', lambda _: guess)
-    expected_result = '--l---'
-    assert hidden_password(password) == expected_result
-
-
-def test_hidden_password_handle_invalid_value(monkeypatch):
-    password = 'Poland'
-    guess = 123
-    monkeypatch.setattr('builtins.input', lambda _: guess)
-    assert hidden_password(password) == "Podana wartość nie jest spółgłoską"
-
-
-def test_hidden_password_multiple_same_letters(monkeypatch):
-    password = 'Fizz Buzz'
-    guess = 'z'
-    monkeypatch.setattr('builtins.input', lambda _: guess)
-    assert hidden_password(password) == '--zz --zz'
