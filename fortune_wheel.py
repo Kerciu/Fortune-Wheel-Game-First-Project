@@ -110,6 +110,18 @@ def check_guessed_letter(word, hidden_word, guessed_letter, points):
         return hidden_word, 0
 
 
+def check_guessed_vowel(word, hidden_word, guessed_vowel):
+    if guessed_vowel in 'aeiou' and guessed_vowel in word:
+        print(f"Zgadłeś! Litera {guessed_vowel} znajduje się w haśle")
+        for i, letter in enumerate(word):
+            if letter == guessed_vowel:
+                hidden_word = hidden_word[:i] + guessed_vowel + hidden_word[i + 1:]
+        return True
+    else:
+        print("Ups! Nie udało się! Kolejka przechodzi na kolejnego gracza")
+        return False
+
+
 def play_round(list_of_words_and_categ, players):
     random_instance = random.choice(list_of_words_and_categ)
     word = random_instance.word()
@@ -117,6 +129,8 @@ def play_round(list_of_words_and_categ, players):
 
     round_over = False
     active_player = 0
+    guessed_consonants = set()
+    guessed_vowels = set()
 
     hidden_word = ''
     for char in word:
@@ -150,14 +164,17 @@ def play_round(list_of_words_and_categ, players):
         elif choice == 'BANKRUT':
             print("Niestety, jesteś BANKRUTEM")
             player.remove_points(player.points())
-            player = players[(active_player + 1) % len(players)]
+            active_player = (active_player + 1) % len(players)
+            player = players[active_player]
             continue
         elif choice == 'NIESPODZIANKA':
             random_surprise = random.choice(surprise)
             prizes.remove('NIESPODZIANKA')
             player.prizes().append(random_surprise)
+            print(f'Wylosowana niespodzianka to... {random_surprise}')
         elif choice == 'STOP':
-            player = active_player = (active_player + 1) % len(players)
+            active_player = (active_player + 1) % len(players)
+            player = players[active_player]
             continue
         elif choice == '500?':
             while True:
@@ -171,12 +188,15 @@ def play_round(list_of_words_and_categ, players):
                         print("Niestety, jesteś BANKRUTEM\n")
                         print("Kolejka przechodzi na następnego gracza...")
                         player.remove_points(player.points())
-                        player = players[(active_player + 1) % len(players)]
-                        break
+                        active_player = (active_player + 1) % len(players)
+                        player = players[active_player]
+                        choice = 0
                     else:
                         player.add_points(3000)
                         print("Gratulacje, udało ci się zdobyć 3000 zł !")
-                        break
+                        active_player = (active_player + 1) % len(players)
+                        player = players[active_player]
+                        choice = 3000
                 elif decision == '2':
                     player.add_points(500)
                     print("Dodano 500 zl do twojego konta")
@@ -190,17 +210,27 @@ def play_round(list_of_words_and_categ, players):
         while '-' in hidden_word:
             print(info)
             guess = input(f"Kolej gracza {player.nickname()}, podaj spółgłoskę: ").lower()
-            if len(guess) != 1 or guess not in consonants:
-                print("Podana wartość nie jest spółgłoską")
-                continue
+            if len(guess) == 1 and guess:
+                guessed_letter = guess[0]
+                if guessed_letter in guessed_consonants:
+                    print("Ta litera została już odgadnięta. Kolejka przechodzi na następnego gracza")
+                    active_player = (active_player + 1) % len(players)
+                    player = players[active_player]
+                    continue
 
-            hidden_word, points = check_guessed_letter(word, hidden_word, guess, choice)
-            if points > 0:
-                player.add_points(points)
-                break
+                guessed_consonants.add(guess)
+
+                hidden_word, points = check_guessed_letter(word, hidden_word, guess, choice)
+                if points > 0:
+                    player.add_points(points)
+                    hidden_word = check_guessed_letter(word, hidden_word, guess, choice)[0]
+                else:
+                    active_player = (active_player + 1) % len(players)
+                    player = players[active_player]
+                    break
             else:
-                player = player[(active_player + 1) % len(players)]
-                break
+                print("Podana wartość nie jest spółgłoską, spróbuj ponownie.")
+                continue
 
         while True:
             choice_input = input(f"Co chcesz teraz zrobić, graczu {player.nickname()}?\n"
@@ -226,25 +256,34 @@ def play_round(list_of_words_and_categ, players):
                         if vowel not in vowels:
                             print("Wybór musi być samogłoską!")
                             continue
-                        if vowel in word:
-                            hidden_word, points = check_guessed_letter(word, hidden_word, vowel, prizes)
-                            if points == 0:
-                                print("Wybrana samogłoska nie znajduje się w haśle.")
-                                break
-                            else:
+                        if vowel in guessed_vowels:
+                            print("Ta samogłoska została już odgadnięta.")
+                            continue
+
+                        guessed_vowels(vowel)
+
+                        correct_vowel = check_guessed_vowel(word, hidden_word, vowel)
+                        if correct_vowel:
+                            hidden_word = check_guessed_vowel(word, hidden_word, vowel)
+                            if hidden_word:
                                 player.remove_points(price_for_vowel)
                                 print(f"Zakupiłeś samogłoskę '{vowel}'. Nowe ukryte hasło:\n{hidden_word}")
+                            else:
+                                print("Wybrana samogłoska nie znajduje się w haśle.")
                                 break
+                        else:
+                            print("Wybrana samogłoska nie znajduje się w haśle.")
+                            break
             elif choice_input == '3':
                 print("Wybrałeś opcję odgadnięcia pełnego hasła!")
                 guess = guess_full_password(players, word)
                 if guess:
                     time.sleep(2)
-                    for player in players:
-                        player.add_perm_points(player.points())
-                        round_over = True
+                    active_player.add_perm_points(active_player.points())
+                    round_over = True
                 else:
-                    player = players[(active_player + 1) % len(players)]
+                    active_player = (active_player + 1) % len(players)
+                    player = players[active_player]
             else:
                 print("Niepoprawne wejście, wybierz 1, 2 lub 3")
                 continue

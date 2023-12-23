@@ -46,6 +46,8 @@ class Player:
         self._points += new_points
 
     def remove_points(self, new_points):
+        if new_points > self._points:
+            self._points == 0
         self._points -= new_points
 
     def add_prizes(self, new_prizes):
