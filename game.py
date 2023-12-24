@@ -22,6 +22,12 @@ def main():
             print(f"Koniec rundy {round_number}.")
             time.sleep(2)
             round_number += 1
+    winner = fortune_wheel.winner(players)
+    fortune_wheel.clear_terminal()
+    print("======== FINAŁ ========")
+    time.sleep(3)
+    fortune_wheel.clear_terminal()
+    fortune_wheel.final_round(words_and_categories, winner)
 
     print("Dziękujemy za grę!")
 

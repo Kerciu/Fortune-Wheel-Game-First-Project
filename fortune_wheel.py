@@ -79,7 +79,6 @@ def center_text(text):
 
 
 def guess_full_password(players, word):
-    clear_terminal()
     print("Wybrałeś opcję odgadnięcia pełnego hasła!")
     print("Wprowadź hasło lub naciśnij enter by kontynuować: ")
     full_guess = input().lower()
@@ -95,6 +94,31 @@ def guess_full_password(players, word):
         time.sleep(2)  # Dodatkowe opóźnienie dla czytelności komunikatu
         clear_terminal()
     return False
+
+
+def guess_final_password(player, word):
+    for i in range(10, 0, -1):
+        print(i, end='\r')
+        time.sleep(1)
+
+    full_guess = input("Podaj hasło:").lower()
+
+    correct_guess = False
+    if full_guess == word.lower():
+        correct_guess = True
+        print(f"Gratulacje, {player.nickname()}! Odgadłeś/aś hasło: {word}!")
+        time.sleep(2)
+        print(f"Twoja wygrana: {player.perm_points()} zł i Polonez Caro!")
+        time.sleep(1)
+        print("Szukaj go w swoim garażu :)\nDo zobaczenia wkrótce!!!")
+        time.sleep(3)
+    if not correct_guess:
+        print("Niestety, to nieprawidłowe hasło, ale i tak...\n")
+        time.sleep(1)
+        print(f"Wygrałeś {player.perm_points()} zł !!!")
+        time.sleep(1)
+        print("Do zobaczenia wkrótce!!!")
+        time.sleep(3)
 
 
 def update_hidden_word(word, hidden_word, guessed_letter):
@@ -124,6 +148,21 @@ def check_guessed_letter(word, hidden_word, guessed_letter, points):
     else:
         print("Ups! Nie udało się! Kolejka przechodzi na kolejnego gracza")
         return hidden_word, 0
+
+
+def check_final_input_letters(word, hidden_word, guessed_letter_list):
+    update_hidden_word = list(hidden_word)
+
+    for guessed_letter in guessed_letter_list:
+        letter_found = False
+        for i, letter in enumerate(word):
+            if letter == guessed_letter:
+                update_hidden_word[i] = guessed_letter
+                letter_found = True
+        if letter_found:
+            return ''.join(update_hidden_word)
+        else:
+            return hidden_word
 
 
 def check_guessed_vowel(word, hidden_word, guessed_vowel):
@@ -263,7 +302,6 @@ def play_round(list_of_words_and_categ, players):
         while True:
             time.sleep(3)
             clear_terminal()
-            print(info)
             choice_input = input(f"Co chcesz teraz zrobić, graczu {player.nickname()}?\n"
                     "1. Zakręć ponownie kołem\n"
                     "2. Kup samogłoskę\n"
@@ -308,12 +346,16 @@ def play_round(list_of_words_and_categ, players):
                             print("Wybrana samogłoska nie znajduje się w haśle.")
                             break
             elif choice_input == '3':
+                clear_terminal()
                 info = f"Kategoria: {category}\nUkryte hasło:\n{hidden_word}"
                 print(info)
+                time.sleep(1)
                 guess = guess_full_password(players, word)
                 if guess:
                     time.sleep(2)
                     player.add_perm_points(player.points())
+                    for final_player in players:
+                        final_player.remove_points(player.points())
                     round_over = True
                     return True
                 else:
@@ -329,11 +371,27 @@ def winner(players):
     return max(players, key=lambda player: player.perm_points())
 
 
+def pre_final(players):
+    pass
+
+
 def final_round(list_of_words_and_categ, winner):
     random_instance = random.choice(list_of_words_and_categ)
     word = random_instance.word()
     category = random_instance.category()
-    pass
+    guessed_letters = set()
+    list_of_letters = ['r', 's', 't', 'l', 'n', 'e']
+    hidden_word = hide_word(word, guessed_letters)
+    print(f"Zaczynamy rundę finałową. Finalistą jest gracz {winner}.\n")
+    time.sleep(1)
+    print(f"Hasło finałowe: {hidden_word}\nKategora: {category}.")
+    time.sleep(1)
+    print("Podaję zestaw liter: R, S, T, L, N, E")
+    time.sleep(2)
+    clear_terminal()
+    update_word = check_final_input_letters(word, hidden_word, list_of_letters)
+    print(f"Hasło finałowe: {update_word}\nKategora: {category}.")
+    guess_final_password(winner, word)
 
 
 def inform_players(players):
