@@ -23,6 +23,8 @@ def main():
             round_number += 1
     winner = fortune_wheel.winner(players)
     fortune_wheel.clear_terminal()
+    fortune_wheel.pre_final(players)
+    fortune_wheel.clear_terminal()
     print("======== FINAŁ ========")
     time.sleep(3)
     fortune_wheel.clear_terminal()

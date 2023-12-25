@@ -389,7 +389,18 @@ def winner(players):
 
 
 def pre_final(players):
-    pass
+    player_list = []
+    winner_player = winner(players)
+    for player in players:
+        player_list.append(player)
+        losers = player_list.remove(winner_player)
+    clear_terminal()
+    losers_info = [loser.end_info() for loser in losers]
+    print("Dziękujemy wszystkim graczom za grę:")
+    for info in losers_info:
+        print(info)
+    time.sleep(3)
+    print("Przechodzimy teraz do finału...")
 
 
 def final_round(list_of_words_and_categ, winner):
