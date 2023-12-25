@@ -168,7 +168,7 @@ def check_final_input_letters(word, hidden_word, guessed_letter_list):
 
 
 def check_guessed_vowel(word, hidden_word, guessed_vowel):
-    if guessed_vowel in 'aeiou' and guessed_vowel in word:
+    if guessed_vowel in 'aeiouąęó' and guessed_vowel in word:
         print(f"Zgadłeś! Litera {guessed_vowel} znajduje się w haśle")
         for i, letter in enumerate(word):
             if letter == guessed_vowel:
@@ -177,6 +177,12 @@ def check_guessed_vowel(word, hidden_word, guessed_vowel):
     else:
         print("Ups! Nie udało się! Kolejka przechodzi na kolejnego gracza")
         return False, hidden_word
+
+
+def remove_player_points(players):
+    for player in players:
+        if player.points() > 0:
+            player.remove_points(player.points())
 
 
 def hide_word(word, guessed_letters):
@@ -277,7 +283,7 @@ def play_round(list_of_words_and_categ, players):
                     continue
         # Reszta kodu logiki gry
         while '-' in hidden_word:
-            consonants = set('qwrtypsdfghjklzxcvbnm')
+            consonants = set('qwrtypsdfghjklzxcvbnmśłżźćń')
             print(info)
             guess = input(f"Kolej gracza {player.nickname()}, podaj spółgłoskę: ").lower()
             if len(guess) == 1 and guess:
@@ -285,11 +291,13 @@ def play_round(list_of_words_and_categ, players):
                     print("Ta litera spółgłoska już odgadnięta. Kolejka przechodzi na następnego gracza")
                     active_player = (active_player + 1) % len(players)
                     player = players[active_player]
+                    clear_terminal()
                     continue
                 if guess not in consonants:
                     print("Ta litera nie jest samogłoską! Kolejka przechodzi na kolejnego gracza")
                     active_player = (active_player + 1) % len(players)
                     player = players[active_player]
+                    clear_terminal()
                     continue
 
                 guessed_consonants.add(guess)
@@ -371,8 +379,7 @@ def play_round(list_of_words_and_categ, players):
                 if guess:
                     time.sleep(2)
                     player.add_perm_points(player.points())
-                    for final_player in players:
-                        final_player.remove_points(player.points())
+                    remove_player_points(players)
                     round_over = True
                     return True
                 else:
@@ -389,11 +396,9 @@ def winner(players):
 
 
 def pre_final(players):
-    player_list = []
     winner_player = winner(players)
-    for player in players:
-        player_list.append(player)
-        losers = player_list.remove(winner_player)
+    losers = [player for player in players if player != winner_player]
+
     clear_terminal()
     losers_info = [loser.end_info() for loser in losers]
     print("Dziękujemy wszystkim graczom za grę:")
