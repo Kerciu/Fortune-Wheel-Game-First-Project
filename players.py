@@ -46,18 +46,31 @@ class Player:
         self._points += new_points
 
     def remove_points(self, points):
+        """
+        Removes points from player's account
+        """
         if points > self._points:
             self._points = 0
         else:
             self._points -= points
 
     def add_prizes(self, new_prizes):
+        """
+        Adds won prizes to player's account
+        """
         self._prizes.append(new_prizes)
 
     def info(self):
         nickname = self._nickname
-        exception_points = 'point' if self._points == 1 else 'points'
-        return f"{nickname.capitalize()} has {self._points} {exception_points}."
+        exception_points = 'punkt' if self._points == 1 else 'punktów'
+        prizes = f'\t\nWygrane nagrody: {self._prizes}' if self._prizes else ''
+        return f"{nickname.capitalize()} ma {self._points} {exception_points}." + prizes
+
+    def end_info(self):
+        nickname = self._nickname
+        exception_points = 'punkt' if self._perm_points == 1 else 'punktów'
+        prizes = f'\t\nWygrane nagrody: {self._prizes}' if self._prizes else ''
+        return f"{nickname.capitalize()} ma {self._perm_points} {exception_points}." + prizes
 
     def __str__(self):
         return self.info()
