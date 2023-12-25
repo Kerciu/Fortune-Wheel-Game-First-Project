@@ -218,7 +218,7 @@
     { "kategoria": "Legendarni Konstruktorzy Lotniczy", "hasło": "Wilbur i Orville Wright" },
     { "kategoria": "Słynni Kompozytorzy Impresjoniści", "hasło": "Claude Debussy" },
     { "kategoria": "Wielkie Odkrycia w Astronomii", "hasło": "Prawo Keplera" },
-    { "kategoria": "Słynne Bitwy Wojny Trzydziestoletniej", "hasło": "Bitwa na Białej Górze" }
+    { "kategoria": "Słynne Bitwy Wojny Trzydziestoletniej", "hasło": "Bitwa na Białej Górze" },
     { "kategoria": "Kraje Afryki", "hasło": "Botswana" },
     { "kategoria": "Sławni Aktorzy", "hasło": "Tom Hanks" },
     { "kategoria": "Lotnicze Zawody", "hasło": "Stewardesa" },
@@ -302,6 +302,6 @@
     { "kategoria": "Słynne Koncerty Jazzowe", "hasło": "Kind of Blue Milesa Davisa" },
     { "kategoria": "Znane Oratoria", "hasło": "Mesjasz Haendla" },
     { "kategoria": "Ważne Traktaty Filozoficzne", "hasło": "Rozważania O Pierwszej Filozofii Rene Descartesa" },
-    { "kategoria": "Słynne Dzieła w Literaturze Rosyjskiej", "hasło": "Zbrodnia i Kara Fiodora Dostojewskiego" },
+    { "kategoria": "Słynne Dzieła w Literaturze Rosyjskiej", "hasło": "Zbrodnia i Kara Fiodora Dostojewskiego" }
   ]
 }
