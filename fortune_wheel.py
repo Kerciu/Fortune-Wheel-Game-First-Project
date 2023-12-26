@@ -6,7 +6,6 @@ from players import Player, WordAndCategory
 
 
 def clear_terminal():
-    # Czyszczenie terminala
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
@@ -15,12 +14,9 @@ def print_fences():
 
 
 def fortune_wheel(choices):
-    # Wylosowana losowa wartość z koła fortuny i wymieszana lista
     picked_up_prize = random.choice(choices)
     copied_choices = choices.copy()
     random.shuffle(copied_choices)
-
-    # Wyświetlanie elementów koła fortuny z rosnącym opóźnieniem
     delay = 0.03
     for i, element in enumerate(2 * copied_choices):
         clear_terminal()
@@ -29,10 +25,7 @@ def fortune_wheel(choices):
         else:
             print(element)
         time.sleep(delay)
-        # Zwiększanie opóźnienie wraz z kolejnym wyświetlanym elementem
         delay += 0.01
-
-    # Opóźnienie przed wyświetleniem wyniku i wyczyszczenie terminala
     time.sleep(1)
     clear_terminal()
     return picked_up_prize
@@ -91,36 +84,9 @@ def guess_full_password(players, word):
             return True
     if not correct_guess:
         print("Niestety, to nieprawidłowe hasło. Kolej na następnego gracza.")
-        time.sleep(2)  # Dodatkowe opóźnienie dla czytelności komunikatu
+        time.sleep(2)
         clear_terminal()
     return False
-
-
-def guess_final_password(player, word):
-    for i in range(10, 0, -1):
-        print(int(i), end='\r')
-        time.sleep(1)
-
-    full_guess = input("Podaj hasło:").lower()
-
-    correct_guess = False
-    if full_guess == word.lower():
-        correct_guess = True
-        clear_terminal()
-        print(f"Gratulacje, {player.nickname()}! Odgadłeś/aś hasło: {word}!")
-        time.sleep(2)
-        print(f"Twoja wygrana: {player.perm_points()} zł i Polonez Caro!")
-        time.sleep(2)
-        print("Szukaj go w swoim garażu :)\nDo zobaczenia wkrótce!!!")
-        time.sleep(3)
-    if not correct_guess:
-        clear_terminal()
-        print("Niestety, to nieprawidłowe hasło, ale i tak...\n")
-        time.sleep(1)
-        print(f"Wygrałeś {player.perm_points()} zł !!!")
-        time.sleep(1)
-        print("Do zobaczenia wkrótce!!!")
-        time.sleep(3)
 
 
 def update_hidden_word(word, hidden_word, guessed_letter):
@@ -230,7 +196,6 @@ def play_round(list_of_words_and_categ, players):
         time.sleep(1)
         if isinstance(choice, int):
             print(f"Otrzymane punkty: {choice}")
-            # player.add_points(choice)
         elif choice == 'BANKRUT':
             print("Niestety, jesteś BANKRUTEM")
             player.remove_points(player.points())
@@ -355,7 +320,7 @@ def play_round(list_of_words_and_categ, players):
 
                         correct_vowel = check_guessed_vowel(word, hidden_word, vowel)
                         if correct_vowel[0]:
-                            hidden_word = check_guessed_vowel(word, hidden_word, vowel)[1]
+                            hidden_word = correct_vowel[1]
                             if hidden_word:
                                 player.remove_points(price_for_vowel)
                                 print(f"Zakupiłeś samogłoskę '{vowel}'. Nowe ukryte hasło:\n{hidden_word}")
@@ -400,12 +365,62 @@ def pre_final(players):
     losers = [player for player in players if player != winner_player]
 
     clear_terminal()
-    losers_info = [loser.end_info() for loser in losers]
+    losers_name = [loser.nickname() for loser in losers]
     print("Dziękujemy wszystkim graczom za grę:")
-    for info in losers_info:
-        print(info)
+    for name in losers_name:
+        print(name)
     time.sleep(3)
     print("Przechodzimy teraz do finału...")
+    time.sleep(3)
+
+
+def reveal_rand_letters(word):
+    hidden_list = ['-' if char != ' ' else ' ' for char in word]
+
+    consonants = 'qwrtyipsśdfghjklłzżxźcćvbnm'
+    alphabet_list = consonants.split()
+
+    revealed_count = 0
+    revealed_word = list(word.lower())
+    while revealed_count < 5:
+        guessed_letter = random.choice(alphabet_list)
+        if guessed_letter in word and guessed_letter not in revealed_word:
+            for i, letter in enumerate(word):
+                if letter == guessed_letter:
+                    revealed_word[i] = guessed_letter
+                    revealed_count += 1
+                    print(''.join(hidden_list), end='\r')
+                    time.sleep(2)
+                    break
+    return ''.join(hidden_list)
+
+
+def guess_final_password(player, word):
+    for i in range(10, 0, -1):
+        revealed_word = reveal_rand_letters(word)
+        print(f'Pozostało: {int(i)} sekund', end='\r')
+        time.sleep(1)
+
+    full_guess = input("Podaj hasło: ").lower()
+
+    correct_guess = False
+    if full_guess == word.lower():
+        correct_guess = True
+        clear_terminal()
+        print(f"Gratulacje, {player.nickname()}! Odgadłeś/aś hasło: {word}!")
+        time.sleep(2)
+        print(f"Twoja wygrana: {player.perm_points()} zł i Polonez Caro!")
+        time.sleep(2)
+        print("Szukaj go w swoim garażu :)\nDo zobaczenia wkrótce!!!")
+        time.sleep(5)
+    if not correct_guess:
+        clear_terminal()
+        print("Niestety, to nieprawidłowe hasło, ale i tak...\n")
+        time.sleep(2)
+        print(f"Wygrałeś {player.perm_points()} zł !!!")
+        time.sleep(2)
+        print("Do zobaczenia wkrótce!!!")
+        time.sleep(5)
 
 
 def final_round(list_of_words_and_categ, winner):
@@ -415,7 +430,7 @@ def final_round(list_of_words_and_categ, winner):
     guessed_letters = set()
     list_of_letters = ['r', 's', 't', 'l', 'n', 'e']
     hidden_word = hide_word(word, guessed_letters)
-    print(f"Zaczynamy rundę finałową. Finalistą jest gracz {winner}.\n")
+    print(f"Zaczynamy rundę finałową. Finalistą jest gracz {winner.nickname()}.\n")
     time.sleep(3)
     print(f"Hasło finałowe: {hidden_word}\nKategora: {category}.")
     time.sleep(3)
