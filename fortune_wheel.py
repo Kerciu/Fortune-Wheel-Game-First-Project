@@ -246,7 +246,6 @@ def play_round(list_of_words_and_categ, players):
                 else:
                     print("Nieprawidłowa wartość")
                     continue
-        # Reszta kodu logiki gry
         while '-' in hidden_word:
             consonants = set('qwrtypsdfghjklzxcvbnmśłżźćń')
             print(info)
@@ -374,31 +373,26 @@ def pre_final(players):
     time.sleep(3)
 
 
-def reveal_rand_letters(word):
+def reveal_rand_letters(word, revealed_idx):
+    alphabet = 'abcdefghijklmnopqrstuvwxyz'
     hidden_list = ['-' if char != ' ' else ' ' for char in word]
 
-    consonants = 'qwrtyipsśdfghjklłzżxźcćvbnm'
-    alphabet_list = consonants.split()
-
     revealed_count = 0
-    revealed_word = list(word.lower())
     while revealed_count < 5:
-        guessed_letter = random.choice(alphabet_list)
-        if guessed_letter in word and guessed_letter not in revealed_word:
-            for i, letter in enumerate(word):
-                if letter == guessed_letter:
-                    revealed_word[i] = guessed_letter
-                    revealed_count += 1
-                    print(''.join(hidden_list), end='\r')
-                    time.sleep(2)
-                    break
-    return ''.join(hidden_list)
+        guess_index = random.randint(0, len(word) - 1)
+        if word[guess_index] in alphabet and guess_index not in revealed_idx:
+            hidden_list[guess_index] = word[guess_index]
+            revealed_idx.add(guess_index)
+            revealed_count += 1
+            print(''.join(hidden_list), end='\r')
+            time.sleep(1)
 
 
 def guess_final_password(player, word):
+    revealed_indexes = set()
     for i in range(10, 0, -1):
-        revealed_word = reveal_rand_letters(word)
         print(f'Pozostało: {int(i)} sekund', end='\r')
+        reveal_rand_letters(word, revealed_indexes)
         time.sleep(1)
 
     full_guess = input("Podaj hasło: ").lower()
