@@ -66,12 +66,6 @@ def load_from_json():
     return word_and_category_list
 
 
-def center_text(text):
-    for char in text:
-        char_len = len(char)
-        return ' ' * char_len
-
-
 def guess_full_password(players, word):
     print("Wybrałeś opcję odgadnięcia pełnego hasła!")
     print("Wprowadź hasło i naciśnij enter by kontynuować: ")
@@ -378,41 +372,39 @@ def pre_final(players):
 
 def reveal_letters(hidden_word, actual_word):
     revealed_word = list(hidden_word)
-    alphabet = 'abcdefghijklmnopqrstuvwxyz'
+    alphabet = 'abcdfghijkmopquvwxyz'
     revealed_indices = set()
 
-    while len(revealed_indices) < 5:
+    while len(revealed_indices) < 8:
         guess_index = random.randint(0, len(actual_word) - 1)
         if actual_word[guess_index] in alphabet and guess_index not in revealed_indices:
             revealed_word[guess_index] = actual_word[guess_index]
             revealed_indices.add(guess_index)
             print(''.join(revealed_word), end='\r')
-            time.sleep(2)
+            time.sleep(0.5)
 
     return ''.join(revealed_word)
 
 
 def countdown():
     for i in range(10, -1, -1):
-        seconds = 'sekunda' if i == 1 else 'sekund'
-        print(f'Pozostało: {int(i)} {seconds}', end='\r')
+        if i == 1:
+            seconds = 'sekunda'
+        elif i in (2, 3, 4):
+            seconds = 'sekundy'
+        else:
+            seconds = 'sekund'
+
+        print(f'Pozostało: {i} {seconds}', end='\r')
         time.sleep(1)
 
 
-def guess_final_password(player, word):
-    hidden_word = ''.join(['-' if char != ' ' else ' ' for char in word])
+def guess_final_password(player, word, update_word):
+    hidden_word = update_word
 
-    thread1 = threading.Thread(target=reveal_letters, args=(hidden_word, word))
-    thread2 = threading.Thread(target=countdown)
-
-    thread1.start()
+    reveal_letters(hidden_word, word)
     print('\n')
-    thread2.start()
-    print('\n')
-
-    thread1.join()
-    thread2.join()
-
+    countdown()
     print('\n')
     full_guess = input("Podaj hasło: ").lower()
 
@@ -452,7 +444,7 @@ def final_round(list_of_words_and_categ, winner):
     clear_terminal()
     update_word = check_final_input_letters(word, hidden_word, list_of_letters)
     print(f"Hasło finałowe: {update_word}\nKategora: {category}.")
-    guess_final_password(winner, word)
+    guess_final_password(winner, word, update_word)
 
 
 def inform_players(players):
