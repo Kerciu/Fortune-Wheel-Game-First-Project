@@ -72,8 +72,9 @@ def guess_full_password(players, word):
     full_guess = input().lower()
 
     correct_guess = False
+    formated_word = word.lower()
     for player in players:
-        if full_guess == word.lower():
+        if full_guess == formated_word:
             correct_guess = True
             print(f"Gratulacje, {player.nickname()}! Odgadłeś/aś hasło: {word}!")
             return True
@@ -162,6 +163,7 @@ def play_round(list_of_words_and_categ, players):
     category = random_instance.category()
 
     round_over = False
+    break_continue = False
     active_player = 0
     guessed_consonants = set()
     guessed_vowels = set()
@@ -189,58 +191,66 @@ def play_round(list_of_words_and_categ, players):
         choice = fortune_wheel(prizes)
         print(f'Wylosowano: {choice}')
         time.sleep(1)
-        if isinstance(choice, int):
-            print(f"Otrzymane punkty: {choice}")
-        elif choice == 'BANKRUT':
-            print("Niestety, jesteś BANKRUTEM")
-            player.remove_points(player.points())
-            active_player = (active_player + 1) % len(players)
-            player = players[active_player]
-            choice = 0
-            continue
-        elif choice == 'NIESPODZIANKA':
-            random_surprise = random.choice(surprise)
-            prizes.remove('NIESPODZIANKA')
-            player.prizes().append(random_surprise)
-            print(f'Wylosowana niespodzianka to... {random_surprise}\nDo tego zdobyłeś 50 punktów.')
-            choice = 50
-        elif choice == 'STOP':
-            active_player = (active_player + 1) % len(players)
-            player = players[active_player]
-            choice = 0
-            continue
-        elif choice == '500?':
-            while True:
-                decision = input("Odkrywasz pole czy obstawiasz za 500 zl?\n"
-                            "1. Odkrywam\n"
-                            "2. Obstawiam\n"
-                            "Decyzja: ")
-                if decision == '1':
-                    random_choice = random.choice(['BANKRUT', 3000])
-                    if random_choice == 'BANKRUT':
-                        clear_terminal()
-                        print("Niestety, jesteś BANKRUTEM\n")
-                        print("Kolejka przechodzi na następnego gracza...")
-                        player.remove_points(player.points())
-                        choice = 0
-                        active_player = (active_player + 1) % len(players)
-                        player = players[active_player]
+        match choice:
+            case int():
+                print(f"Otrzymane punkty: {choice}")
+            case 'BANKRUT':
+                print("Niestety, jesteś BANKRUTEM")
+                player.remove_points(player.points())
+                active_player = (active_player + 1) % len(players)
+                player = players[active_player]
+                choice = 0
+                continue
+            case 'NIESPODZIANKA':
+                random_surprise = random.choice(surprise)
+                prizes.remove('NIESPODZIANKA')
+                player.prizes().append(random_surprise)
+                print(f'Wylosowana niespodzianka to... {random_surprise}\nDo tego zdobyłeś 50 punktów.')
+                choice = 50
+            case 'STOP':
+                active_player = (active_player + 1) % len(players)
+                player = players[active_player]
+                choice = 0
+                continue
+            case '500?':
+                while True:
+                    decision = input("Odkrywasz pole czy obstawiasz za 500 zl?\n"
+                                "1. Odkrywam\n"
+                                "2. Obstawiam\n"
+                                "Decyzja: ")
+                    if decision == '1':
+                        random_choice = random.choice(['BANKRUT', 3000])
+                        if random_choice == 'BANKRUT':
+                            clear_terminal()
+                            print("Niestety, jesteś BANKRUTEM\n")
+                            print("Kolejka przechodzi na następnego gracza...")
+                            player.remove_points(player.points())
+                            choice = 0
+                            active_player = (active_player + 1) % len(players)
+                            player = players[active_player]
+                            break_continue = True
+                            time.sleep(2)
+                            break
+                        else:
+                            player.add_points(3000)
+                            print("Gratulacje, udało ci się zdobyć 3000 zł !")
+                            active_player = (active_player + 1) % len(players)
+                            player = players[active_player]
+                            choice = 3000
+                            time.sleep(2)
+                            break
+                    elif decision == '2':
+                        player.add_points(500)
+                        choice = 500
+                        print("Dodano 500 zl do twojego konta")
+                        time.sleep(2)
                         break
                     else:
-                        player.add_points(3000)
-                        print("Gratulacje, udało ci się zdobyć 3000 zł !")
-                        active_player = (active_player + 1) % len(players)
-                        player = players[active_player]
-                        choice = 3000
-                        break
-                elif decision == '2':
-                    player.add_points(500)
-                    choice = 500
-                    print("Dodano 500 zl do twojego konta")
-                    break
-                else:
-                    print("Nieprawidłowa wartość")
+                        print("Nieprawidłowa wartość")
+                        continue
+                if break_continue:
                     continue
+
         while '-' in hidden_word:
             consonants = set('qwrtypsdfghjklzxcvbnmśłżźćń')
             print(info)
@@ -264,7 +274,7 @@ def play_round(list_of_words_and_categ, players):
                 guessed_consonants.add(guess)
                 guessed_letters.add(guess)
 
-                part, points = check_guessed_letter(word, hidden_word, guess, choice)
+                x, points = check_guessed_letter(word, hidden_word, guess, choice)
                 if points > 0:
                     player.add_points(points)
                     updated_hidden_word = update_hidden_word(word, hidden_word, guess)
@@ -374,14 +384,16 @@ def reveal_letters(hidden_word, actual_word):
     revealed_word = list(hidden_word)
     alphabet = 'abcdfghijkmopquvwxyz'
     revealed_indices = set()
+    time_limit = 10
+    start_time = time.time()
 
-    while len(revealed_indices) < 8:
+    while len(revealed_indices) < 5 and time.time() - start_time < time_limit:
         guess_index = random.randint(0, len(actual_word) - 1)
         if actual_word[guess_index] in alphabet and guess_index not in revealed_indices:
             revealed_word[guess_index] = actual_word[guess_index]
             revealed_indices.add(guess_index)
             print(''.join(revealed_word), end='\r')
-            time.sleep(0.5)
+            time.sleep(1)
 
     return ''.join(revealed_word)
 

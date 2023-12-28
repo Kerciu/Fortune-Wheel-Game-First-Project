@@ -25,7 +25,7 @@ def main():
     fortune_wheel.clear_terminal()
     fortune_wheel.pre_final(players)
     fortune_wheel.clear_terminal()
-    print("======== FINAŁ ========")
+    print("======================= FINAŁ =======================")
     time.sleep(3)
     fortune_wheel.final_round(words_and_categories, winner)
 
