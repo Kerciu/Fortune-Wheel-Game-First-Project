@@ -2,6 +2,7 @@ import random
 import time
 import os
 import json
+import threading
 from players import Player, WordAndCategory
 
 
@@ -255,12 +256,14 @@ def play_round(list_of_words_and_categ, players):
                     print("Ta litera spółgłoska już odgadnięta. Kolejka przechodzi na następnego gracza")
                     active_player = (active_player + 1) % len(players)
                     player = players[active_player]
+                    time.sleep(2)
                     clear_terminal()
                     continue
                 if guess not in consonants:
                     print("Ta litera nie jest samogłoską! Kolejka przechodzi na kolejnego gracza")
                     active_player = (active_player + 1) % len(players)
                     player = players[active_player]
+                    time.sleep(2)
                     clear_terminal()
                     continue
 
@@ -373,28 +376,44 @@ def pre_final(players):
     time.sleep(3)
 
 
-def reveal_rand_letters(word, revealed_idx):
+def reveal_letters(hidden_word, actual_word):
+    revealed_word = list(hidden_word)
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
-    hidden_list = ['-' if char != ' ' else ' ' for char in word]
+    revealed_indices = set()
 
-    revealed_count = 0
-    while revealed_count < 5:
-        guess_index = random.randint(0, len(word) - 1)
-        if word[guess_index] in alphabet and guess_index not in revealed_idx:
-            hidden_list[guess_index] = word[guess_index]
-            revealed_idx.add(guess_index)
-            revealed_count += 1
-            print(''.join(hidden_list), end='\r')
-            time.sleep(1)
+    while len(revealed_indices) < 5:
+        guess_index = random.randint(0, len(actual_word) - 1)
+        if actual_word[guess_index] in alphabet and guess_index not in revealed_indices:
+            revealed_word[guess_index] = actual_word[guess_index]
+            revealed_indices.add(guess_index)
+            print(''.join(revealed_word), end='\r')
+            time.sleep(2)
+
+    return ''.join(revealed_word)
+
+
+def countdown():
+    for i in range(10, -1, -1):
+        seconds = 'sekunda' if i == 1 else 'sekund'
+        print(f'Pozostało: {int(i)} {seconds}', end='\r')
+        time.sleep(1)
 
 
 def guess_final_password(player, word):
-    revealed_indexes = set()
-    for i in range(10, 0, -1):
-        print(f'Pozostało: {int(i)} sekund', end='\r')
-        reveal_rand_letters(word, revealed_indexes)
-        time.sleep(1)
+    hidden_word = ''.join(['-' if char != ' ' else ' ' for char in word])
 
+    thread1 = threading.Thread(target=reveal_letters, args=(hidden_word, word))
+    thread2 = threading.Thread(target=countdown)
+
+    thread1.start()
+    print('\n')
+    thread2.start()
+    print('\n')
+
+    thread1.join()
+    thread2.join()
+
+    print('\n')
     full_guess = input("Podaj hasło: ").lower()
 
     correct_guess = False
