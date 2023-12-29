@@ -62,12 +62,14 @@ def test_load_from_json_data_loading():
 
 def test_load_from_json_correct_values():
     result = load_from_json()
-    assert all(isinstance(item.word(), str) and isinstance(item.category(), str) for item in result)
+    assert all(isinstance(item.word(), str)
+               and isinstance(item.category(), str) for item in result)
 
 
 def test_load_from_json_keys_exist():
     result = load_from_json()
-    assert all(hasattr(item, 'word') and hasattr(item, 'category') for item in result)
+    assert all(hasattr(item, 'word') and
+               hasattr(item, 'category') for item in result)
 
 
 def test_load_from_json_file_not_empty():
@@ -128,7 +130,8 @@ def test_fortune_wheel_empty_choices():
 def test_fortune_wheel_choice_frequency():
     choices = [100] * 50 + [200] * 30 + [300] * 20
     results = [fortune_wheel(choices) for _ in range(100)]
-    frequencies = {100: results.count(100), 200: results.count(200), 300: results.count(300)}
+    frequencies = {100: results.count(100), 200: results.count(200),
+                   300: results.count(300)}
     assert frequencies == {100: 50, 200: 30, 300: 20}
 
 
@@ -175,7 +178,8 @@ def test_fortune_wheel_output_delay():
     fortune_wheel(choices)
     end_time = time.time()
     elapsed_time = end_time - start_time
-    expected_times = [0.05, 0.08, 0.11, 0.14, 0.17, 0.20, 0.23, 0.26, 0.29, 0.32, 0.35]
+    expected_times = [0.05, 0.08, 0.11, 0.14, 0.17,
+                      0.20, 0.23, 0.26, 0.29, 0.32, 0.35]
     assert elapsed_time in expected_times
 
 
@@ -244,13 +248,17 @@ def test_update_hidden_word():
     assert update_hidden_word('python', '------', 'n') == '-----n'
     assert update_hidden_word('idea', '----', 'd') == '-d--'
 
+
 def test_check_guessed_letter_letter_found():
     word = 'example'
     hidden_word = '------'
     guessed_letter = 'e'
     points = 10
 
-    updated_hidden_word, earned_points = check_guessed_letter(word, hidden_word, guessed_letter, points)
+    updated_hidden_word, earned_points = check_guessed_letter(word,
+                                                              hidden_word,
+                                                              guessed_letter,
+                                                              points)
 
     assert updated_hidden_word == 'e---e--'
     assert earned_points == 10
@@ -262,7 +270,10 @@ def test_check_guessed_letter_letter_not_found():
     guessed_letter = 'z'
     points = 5
 
-    updated_hidden_word, earned_points = check_guessed_letter(word, hidden_word, guessed_letter, points)
+    updated_hidden_word, earned_points = check_guessed_letter(word,
+                                                              hidden_word,
+                                                              guessed_letter,
+                                                              points)
 
     assert updated_hidden_word == '------'
     assert earned_points == 0
@@ -274,7 +285,10 @@ def test_check_guessed_letter_duplicate_letters():
     guessed_letter = 'a'
     points = 15
 
-    updated_hidden_word, earned_points = check_guessed_letter(word, hidden_word, guessed_letter, points)
+    updated_hidden_word, earned_points = check_guessed_letter(word,
+                                                              hidden_word,
+                                                              guessed_letter,
+                                                              points)
 
     assert updated_hidden_word == '-a-a-a'
     assert earned_points == 15
@@ -285,7 +299,9 @@ def test_check_guessed_vowel_vowel_found():
     hidden_word = '------'
     guessed_vowel = 'a'
 
-    vowel_found, updated_hidden_word = check_guessed_vowel(word, hidden_word, guessed_vowel)
+    vowel_found, updated_hidden_word = check_guessed_vowel(word,
+                                                           hidden_word,
+                                                           guessed_vowel)
 
     assert vowel_found is True
     assert updated_hidden_word == '--a---'
@@ -296,7 +312,9 @@ def test_check_guessed_vowel_vowel_not_found():
     hidden_word = '------'
     guessed_vowel = 'i'
 
-    vowel_found, updated_hidden_word = check_guessed_vowel(word, hidden_word, guessed_vowel)
+    vowel_found, updated_hidden_word = check_guessed_vowel(word,
+                                                           hidden_word,
+                                                           guessed_vowel)
 
     assert vowel_found is False
     assert updated_hidden_word == '------'
@@ -307,7 +325,9 @@ def test_check_guessed_vowel_not_a_vowel():
     hidden_word = '------'
     guessed_vowel = 'x'
 
-    vowel_found, updated_hidden_word = check_guessed_vowel(word, hidden_word, guessed_vowel)
+    vowel_found, updated_hidden_word = check_guessed_vowel(word,
+                                                           hidden_word,
+                                                           guessed_vowel)
 
     assert vowel_found is False
     assert updated_hidden_word == '------'
@@ -318,7 +338,9 @@ def test_check_guessed_vowel_accented_vowel():
     hidden_word = '-----'
     guessed_vowel = 'ó'
 
-    vowel_found, updated_hidden_word = check_guessed_vowel(word, hidden_word, guessed_vowel)
+    vowel_found, updated_hidden_word = check_guessed_vowel(word,
+                                                           hidden_word,
+                                                           guessed_vowel)
 
     assert vowel_found is True
     assert updated_hidden_word == '--ó--'
@@ -457,8 +479,9 @@ def test_player_info_with_prizes():
     prize_list = ["Sprzęt AGD", "Pobyt w spa"]
 
     prizes = f'\t\nWygrane nagrody: {prize_list}'
+    name = player.nickname()
 
-    expected_info = f"{player.nickname()} ma {player.points()} punktów." + prizes
+    expected_info = f"{name} ma {player.points()} punktów." + prizes
 
     assert expected_info == player.info()
 
@@ -514,7 +537,8 @@ def test_pre_final_winner_in_players(monkeypatch):
             return self.points_val
 
     winner_player = MockPlayer("Alice", points=100)
-    players = [winner_player, MockPlayer("Bob", points=80), MockPlayer("Charlie", points=70)]
+    players = [winner_player, MockPlayer("Bob", points=80),
+               MockPlayer("Charlie", points=70)]
 
     monkeypatch.setattr('builtins.input', lambda _: '1')
 
