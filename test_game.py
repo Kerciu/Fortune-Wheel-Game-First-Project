@@ -1,4 +1,4 @@
-from players import Player
+from players import Player, WordAndCategory
 from fortune_wheel import (introduction,
                            fortune_wheel,
                            load_from_json,
@@ -19,6 +19,7 @@ from fortune_wheel import (introduction,
                            reveal_letters,
                            guess_final_password,
                            )
+from unittest.mock import patch, call
 import sys
 import pytest
 import json
@@ -73,13 +74,13 @@ def test_load_from_json_keys_exist():
 
 
 def test_load_from_json_file_not_empty():
-    with open('hasla.json') as f:
+    with open('hasla.json', encoding='utf-8') as f:
         data = json.load(f)
         assert len(data['kategorie_i_hasla']) > 0
 
 
 def test_load_from_json_keys_exist_in_data():
-    with open('hasla.json') as f:
+    with open('hasla.json', encoding='utf-8') as f:
         data = json.load(f)
         for item in data['kategorie_i_hasla']:
             assert 'kategoria' in item and 'hasło' in item
@@ -87,7 +88,7 @@ def test_load_from_json_keys_exist_in_data():
 
 def test_load_from_json_valid_json():
     try:
-        with open('hasla.json') as f:
+        with open('hasla.json', encoding='utf-8') as f:
             json.load(f)
     except ValueError:
         assert False
@@ -637,7 +638,7 @@ def test_countdown(capfd):
 
 
 def test_guess_final_password_correct_guess(capfd, monkeypatch):
-    player = "Player1"
+    player = Player("Player1")
     word = "example"
     update_word = "-------"
 
@@ -651,7 +652,7 @@ def test_guess_final_password_correct_guess(capfd, monkeypatch):
 
 
 def test_guess_final_password_wrong_guess(capfd, monkeypatch):
-    player = "Player1"
+    player = Player("Player1")
     word = "example"
     update_word = "-------"
 
@@ -662,3 +663,89 @@ def test_guess_final_password_wrong_guess(capfd, monkeypatch):
 
     captured = capfd.readouterr()
     assert "Niestety" in captured.out
+
+
+def test_guess_full_password_correct():
+    players = [Player("Player1"), Player("Player2"), Player("Player3")]
+    word = "Python"
+    full_guess = "Python"
+
+    with patch('builtins.input', return_value=full_guess):
+        result = guess_full_password(players, word)
+        assert result is True
+
+
+def test_guess_full_password_incorrect():
+    players = [Player("Player1"), Player("Player2"), Player("Player3")]
+    word = "Python"
+    full_guess = "Python 2"
+
+    with patch('builtins.input', return_value=full_guess):
+        result = guess_full_password(players, word)
+        assert result is False
+
+
+def test_final_round_prints_correct_info(capsys):
+    list_of_words_and_categ = [
+        WordAndCategory("Programming", "python"),
+        WordAndCategory("Fruit", "banana")
+    ]
+    winner = Player("John")
+
+    input_values = ['r', 's', 't', 'l', 'n', 'e', 'Python']
+    with patch('builtins.input', side_effect=input_values):
+        final_round(list_of_words_and_categ, winner)
+
+    captured = capsys.readouterr()
+
+    assert "Zaczynamy rundę finałową" in captured.out
+    assert "Hasło finałowe" in captured.out
+    assert "Podaję zestaw liter" in captured.out
+    assert "Finalistą jest gracz John" in captured.out
+
+
+def test_final_round_calls_update_functions_correctly(monkeypatch):
+    list_of_words_and_categ = [
+        WordAndCategory("Programming", "python"),
+        WordAndCategory("Fruit", "banana")
+    ]
+    winner = Player("John")
+
+    def mocked_hide_word(word, guessed_letters):
+        return '-----'
+
+    def mocked_update_hidden_word(word, hidden_word, char):
+        return '-----'
+
+    monkeypatch.setattr('fortune_wheel.hide_word', mocked_hide_word)
+    monkeypatch.setattr('fortune_wheel.update_hidden_word', mocked_update_hidden_word)
+
+    input_values = ['r', 's', 't', 'l', 'n', 'e', 'Python']
+    with patch('fortune_wheel.hide_word') as hide_word_mock, \
+        patch('fortune_wheel.update_hidden_word') as update_hidden_word_mock, \
+        patch('builtins.input', side_effect=input_values):
+        final_round(list_of_words_and_categ, winner)
+        hide_word_mock.assert_called()
+        update_hidden_word_mock.assert_called()
+
+
+def test_final_round_checks_update_word_correctly(capsys):
+    list_of_words_and_categ = [
+        WordAndCategory("Programming", "python"),
+        WordAndCategory("Fruit", "banana")
+    ]
+    winner = Player("John")
+    mocked_hide_word = lambda word, guessed_letters: '*****'
+    mocked_update_hidden_word = lambda word, hidden_word, char: '******'
+
+    with patch('fortune_wheel.hide_word', mocked_hide_word), \
+         patch('fortune_wheel.update_hidden_word', mocked_update_hidden_word):
+
+        input_values = ['r', 's', 'a', 'b', 'c', 'd']
+        with patch('builtins.input', side_effect=input_values):
+            final_round(list_of_words_and_categ, winner)
+
+    captured = capsys.readouterr()
+    assert "Zaczynamy rundę finałową" in captured.out
+    assert "Hasło finałowe" in captured.out
+    assert "Podaję zestaw liter" in captured.out

@@ -6,14 +6,25 @@ from players import Player, WordAndCategory
 
 
 def clear_terminal():
+    """
+    Clears terminal according to user's operation system.
+    """
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def print_fences():
+    """
+    Prints '-' as separators
+    """
     print('--------------')
 
 
 def fortune_wheel(choices):
+    """
+    Handles fortune wheel animation logic.
+    Expects choices as a list of choices on fortune wheel.
+    Returns random element from the fortune wheel.
+    """
     picked_up_prize = random.choice(choices)
     copied_choices = choices.copy()
     random.shuffle(copied_choices)
@@ -32,6 +43,10 @@ def fortune_wheel(choices):
 
 
 def introduction():
+    """
+    Introduces three players to the game. Everyone of them inputs their name.
+    Returns list containing 3 Player instances.
+    """
     time.sleep(1)
     print("Witamy w Kole Fortuny! Przedstawcie się dzisiejsi uczestnicy!")
     time.sleep(3)
@@ -54,6 +69,12 @@ def introduction():
 
 
 def load_from_json():
+    """
+    Loads passwords and categories from json file.
+    Expects json file format.
+    Json file should be nested in the same directory as program itself.
+    Returns list of all WordAndCategory instances.
+    """
     word_and_category_list = []
     with open('hasla.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
@@ -66,6 +87,10 @@ def load_from_json():
 
 
 def guess_full_password(players, word):
+    """
+    Checks whether the full password given by player is correct.
+    Returns true if it is correct, false if it is not.
+    """
     print("Wybrałeś opcję odgadnięcia pełnego hasła!")
     print("Wprowadź hasło i naciśnij enter by kontynuować: ")
     full_guess = input().lower()
@@ -86,6 +111,13 @@ def guess_full_password(players, word):
 
 
 def update_hidden_word(word, hidden_word, guessed_letter):
+    """
+    Updates hidden word for the consonant guessing logic.
+    Iterates over letters in word and hidden characters in hidden word.
+    Reveals letter in hidden word if user guessed it under the condition
+    that the letter is present in the word and it is not a vowel.
+    Returns updated hidden word.
+    """
     updated_hidden_word = ''
     for i, (letter, hidden_char) in enumerate(zip(word, hidden_word)):
         if letter == guessed_letter and guessed_letter not in 'aeiou':
@@ -96,6 +128,16 @@ def update_hidden_word(word, hidden_word, guessed_letter):
 
 
 def check_guessed_letter(word, hidden_word, guessed_letter, points):
+    """
+    Checks whether the player guesses the word correctly.
+    It iterates through the letters of the word and checks if player
+    correctly guessed the letter. If yes, it raises postivie letter_found flag.
+    Returns hidden word and player points which they have got
+    from fortune_wheel().
+    If not, returns hidden word and no points.
+    It differs with update_hidden_word() in a way, that it is returning
+    player points as well, which is used for the play_round() logic.
+    """
     update_hidden_word = list(hidden_word)
     letter_found = False
 
@@ -115,6 +157,7 @@ def check_guessed_letter(word, hidden_word, guessed_letter, points):
 
 
 def check_final_input_letters(word, hidden_word, guessed_letter_list):
+
     update_hidden_word = list(hidden_word)
 
     for guessed_letter in guessed_letter_list:
@@ -130,6 +173,11 @@ def check_final_input_letters(word, hidden_word, guessed_letter_list):
 
 
 def check_guessed_vowel(word, hidden_word, guessed):
+    """
+    Checks whether the vowel given by player is correct or not.
+    Works like check_guessed_letter() function except it refers to vowels.
+    Returns boolean value as index '0' and hidden word as index '1'.
+    """
     if guessed in 'aeiouąęó' and guessed in word:
         print(f"Zgadłeś! Litera {guessed} znajduje się w haśle")
         for i, letter in enumerate(word):
@@ -142,12 +190,22 @@ def check_guessed_vowel(word, hidden_word, guessed):
 
 
 def remove_player_points(players):
+    """
+    Removes player points if points are more than 0.
+    Does not return any value.
+    """
     for player in players:
         if player.points() > 0:
             player.remove_points(player.points())
 
 
 def hide_word(word, guessed_letters):
+    """
+    Hides the word under the condition that it is alphabetical
+    character, and lower case letter has not been in
+    guessed_letters set previously.
+    Returns hidden word.
+    """
     hidden_word = ''
     for char in word:
         if char.isalpha() and char.lower() not in guessed_letters:
@@ -158,6 +216,16 @@ def hide_word(word, guessed_letters):
 
 
 def play_round(list_of_words_and_categ, players):
+    """
+    Simulates a round of a word-guessing game based on 'Wheel of Fortune'.
+    Handles the whole round logic of the game using while not round_over
+    flag.
+    Expects list_of_words_and_categ (list): A list of objects
+    containing words and categories and players (list): A list of player
+    objects participating in the game as arguments.
+    Returns True if a player successfully guesses the full password,
+    False otherwise.
+    """
     random_instance = random.choice(list_of_words_and_categ)
     word = random_instance.word().lower()
     category = random_instance.category()
@@ -377,10 +445,18 @@ def play_round(list_of_words_and_categ, players):
 
 
 def winner(players):
+    """
+    Returns player with the most points using max sorting function.
+    """
     return max(players, key=lambda player: player.perm_points())
 
 
 def pre_final(players):
+    """
+    Thanks loser players for the game and picks a winner player
+    using winner() func.
+    Does not return any value.
+    """
     winner_player = winner(players)
     losers = [player for player in players if player != winner_player]
 
@@ -395,6 +471,16 @@ def pre_final(players):
 
 
 def reveal_letters(hidden_word, actual_word):
+    """
+    Reveals 5 random letters diffrent from [R, S, T, L, N, E]
+    over 10 second period.
+    Prints animation of revealing the hidden word with random letters
+    using while loop restricted by lenght of set of
+    revealed indeces and time of 10 seconds.
+    Works with indeces picking random one and checking
+    if letter under revealed_word is the same as actual_word's.
+    Returns joined reveal_word list.
+    """
     revealed_word = list(hidden_word)
     alpha = 'abcdfghijkmopquvwxyz'
     reveal_idx = set()
@@ -404,15 +490,23 @@ def reveal_letters(hidden_word, actual_word):
     while len(reveal_idx) < 5 and time.time() - start_time < time_limit:
         guess_index = random.randint(0, len(actual_word) - 1)
         if actual_word[guess_index] in alpha and guess_index not in reveal_idx:
-            revealed_word[guess_index] = actual_word[guess_index]
-            reveal_idx.add(guess_index)
-            print(''.join(revealed_word), end='\r')
-            time.sleep(1)
+            try:
+                revealed_word[guess_index] = actual_word[guess_index]
+                reveal_idx.add(guess_index)
+                print(''.join(revealed_word), end='\r')
+                time.sleep(1)
+            except IndexError:
+                pass
 
     return ''.join(revealed_word)
 
 
 def countdown():
+    """
+    Returns countdown animation, which overwrites itself after every iteration.
+    Handles polish gramatical cases.
+    Does not return any value.
+    """
     for i in range(10, -1, -1):
         if i == 1:
             seconds = 'sekunda'
@@ -426,6 +520,16 @@ def countdown():
 
 
 def guess_final_password(player, word, update_word):
+    """
+    Used for animation purposes. Uses reveal_letters() and countdown(), then
+    asks for user input, which is the full password.
+    Uses correct_guess flag for case handling.
+    If user guesses the full password, function congratulates them and informs
+    them that they won their perm_points in polish currency and Polonez Caro.
+    If not they just congratulates them and informs them about their
+    cash prize.
+    Does not return any value.
+    """
     hidden_word = update_word
 
     reveal_letters(hidden_word, word)
@@ -455,6 +559,14 @@ def guess_final_password(player, word, update_word):
 
 
 def final_round(list_of_words_and_categ, winner):
+    """
+    Fetches random WordAndCategory instance. Prints the winner, final password
+    and category. Then it gives update_hidden_word() func a list of
+    R, S, T, L, N and E characters.
+    Then reveals the hidden word with above-mentioned characters and
+    proceeds to use the guess_final_password() func.
+    Does not return any value.
+    """
     random_instance = random.choice(list_of_words_and_categ)
     word = random_instance.word()
     category = random_instance.category()
@@ -469,12 +581,16 @@ def final_round(list_of_words_and_categ, winner):
     print("Podaję zestaw liter: R, S, T, L, N, E")
     time.sleep(3)
     clear_terminal()
-    update_word = check_final_input_letters(word, hidden_word, list_of_letters)
+    for char in list_of_letters:
+        update_word = update_hidden_word(word, hidden_word, char)
     print(f"Hasło finałowe: {update_word}\nKategora: {category}.")
     guess_final_password(winner, word, update_word)
 
 
 def inform_players(players):
+    """
+    Informs players about their current round status.
+    """
     print("======Aktualny stan graczy======")
     for player in players:
         print(player.info())
@@ -482,6 +598,9 @@ def inform_players(players):
 
 
 def end_inform_players(players):
+    """
+    Informs players about their current inter-round status.
+    """
     print("====== Stan graczy na koniec rundy ======")
     for player in players:
         print(player.end_info())

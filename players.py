@@ -62,15 +62,17 @@ class Player:
 
     def info(self):
         nickname = self._nickname
-        exception_points = 'punkt' if self._points == 1 else 'punktów'
+        capitalize = nickname.capitalize()
+        exception = 'punkt' if self._points == 1 else 'punktów'
         prizes = f'\t\nWygrane nagrody: {self._prizes}' if self._prizes else ''
-        return f"{nickname.capitalize()} ma {self._points} {exception_points}." + prizes
+        return f"{capitalize} ma {self._points} {exception}." + prizes
 
     def end_info(self):
         nickname = self._nickname
-        exception_points = 'punkt' if self._perm_points == 1 else 'punktów'
+        capitalize = nickname.capitalize()
+        exception = 'punkt' if self._perm_points == 1 else 'punktów'
         prizes = f'\t\nWygrane nagrody: {self._prizes}' if self._prizes else ''
-        return f"{nickname.capitalize()} ma {self._perm_points} {exception_points}." + prizes
+        return f"{capitalize} ma {self._perm_points} {exception}." + prizes
 
     def __str__(self):
         return self.info()

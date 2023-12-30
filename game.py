@@ -3,6 +3,9 @@ import time
 
 
 def main():
+    """
+    Handles the program logic.
+    """
     fortune_wheel.clear_terminal()
     players = fortune_wheel.introduction()
     time.sleep(3)
@@ -28,6 +31,8 @@ def main():
     print("======================= FINAŁ =======================")
     time.sleep(3)
     fortune_wheel.final_round(words_and_categories, winner)
+    time.sleep(3)
+    fortune_wheel.clear_terminal()
 
     print("Dziękujemy za grę!")
 
