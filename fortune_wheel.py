@@ -175,22 +175,6 @@ def check_guessed_letter(word, hidden_word, guessed_letter, points):
         return hidden_word, 0
 
 
-def check_final_input_letters(word, hidden_word, guessed_letter_list):
-
-    update_hidden_word = list(hidden_word)
-
-    for guessed_letter in guessed_letter_list:
-        letter_found = False
-        for i, letter in enumerate(word):
-            if letter == guessed_letter:
-                update_hidden_word[i] = guessed_letter
-                letter_found = True
-        if letter_found:
-            return ''.join(update_hidden_word)
-        else:
-            return hidden_word
-
-
 def check_guessed_vowel(word, hidden_word, guessed):
     """
     Checks whether the vowel given by player is correct or not.
