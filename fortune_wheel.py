@@ -50,21 +50,40 @@ def introduction():
     time.sleep(1)
     print("Witamy w Kole Fortuny! Przedstawcie się dzisiejsi uczestnicy!")
     time.sleep(3)
-    print_fences()
-    player_one = input("Graczu pierwszy, podaj swoje imię: ")
-    print_fences()
-    player_two = input("Graczu drugi, teraz twoja kolej: ")
-    print_fences()
-    player_three = input('Teraz kolej na gracza numer trzy: ')
+
+    players = []
+    names = set()
+    for i in range(3):
+        while True:
+            print_fences()
+            player_name = input(f"Graczu numer {i+1}, podaj swoje imię: ")
+            clear_terminal()
+            if player_name.strip():
+                if player_name in names:
+                    print("To imię jest już używane. Dodajemy indeks.")
+                    name_count = 1
+                    new_name = f"{player_name} ({name_count})"
+                    while new_name in names:
+                        name_count += 1
+                        new_name = f"{player_name} ({name_count})"
+                    players.append(Player(new_name))
+                    names.add(new_name)
+                    print(f"Witaj graczu {new_name}!")
+                    time.sleep(2)
+                    break
+                else:
+                    names.add(player_name)
+                    print(f"Witaj graczu {player_name}!")
+                    time.sleep(2)
+                    players.append(Player(player_name))
+                    break
+            else:
+                clear_terminal()
+                print("Proszę wprowadzić imię.")
     clear_terminal()
-    introduction = f"Witam was: {player_one}, {player_two} i {player_three}\n"
+    introduction = f"Witam was: {', '.join(names)}\n"
     print(introduction + "Zaczynamy grę!")
 
-    player1 = Player(player_one)
-    player2 = Player(player_two)
-    player3 = Player(player_three)
-
-    players = [player1, player2, player3]
     return players
 
 
@@ -411,6 +430,7 @@ def play_round(list_of_words_and_categ, players):
                                       f" Nowe ukryte hasło:\n{hidden_word}")
                                 break
                             else:
+                                player.remove_points(vowel_price)
                                 print("Wybrana samogłoska nie znajduje się "
                                       "w haśle. Kolej na następnego gracza")
                                 lenght = len(players)
@@ -461,10 +481,9 @@ def pre_final(players):
     losers = [player for player in players if player != winner_player]
 
     clear_terminal()
-    losers_name = [loser.nickname() for loser in losers]
     print("Dziękujemy wszystkim graczom za grę:")
-    for name in losers_name:
-        print(name)
+    for loser in losers:
+        print(f'{loser.nickname()}\n{loser.prize_string()}')
     time.sleep(3)
     print("Przechodzimy teraz do finału...")
     time.sleep(3)

@@ -36,9 +36,6 @@ class Player:
     def prizes(self):
         return self._prizes
 
-    def set_nickname(self, new_nickname):
-        self._nickname = new_nickname
-
     def add_perm_points(self, new):
         self._perm_points += new
 
@@ -73,6 +70,13 @@ class Player:
         exception = 'punkt' if self._perm_points == 1 else 'punktów'
         prizes = f'\t\nWygrane nagrody: {self._prizes}' if self._prizes else ''
         return f"{capitalize} ma {self._perm_points} {exception}." + prizes
+
+    def prize_string(self):
+        if not self._prizes:
+            return '======================'
+        else:
+            prizes = ' i '.join(self._prizes)
+            return f"=== Zabierasz ze sobą {prizes}"
 
     def __str__(self):
         return self.info()

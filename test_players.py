@@ -1,8 +1,8 @@
 import pytest
 from players import (Player,
-                    WordAndCategory,
-                    WrongCategoryError,
-                    WrongWordError)
+                     WordAndCategory,
+                     WrongCategoryError,
+                     WrongWordError)
 
 
 @pytest.fixture
