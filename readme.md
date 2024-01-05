@@ -23,8 +23,11 @@ Po zakończeniu trzech rund wybierany jest zwycięzca z największą liczbą pun
 ### Klasa WordAndCategory
 - Opis: Klasa obsługująca hasła i ich kategorię. Jest to kluczowa klasa dla działania programu, ponieważ przechowuje dane pobrane z pliku 'hasla.json'.
 
-## Instrukcja użytkownika
-Projekt można uruchomić, wykonując wiersz poleceń nazwę modułu 'game.py'.
+## Instrukcja użytkownika dotyczące uruchomienia programu.
+- W terminalu należy wpisać: https://gitlab-stud.elka.pw.edu.pl/kgorski1/projekt.git
+- Następnie: cd 'projekt'
+- W katalogu powinny znajdować się wszystkie kluczowe pliki, czyli **play.py**, **fortune_wheel.py**, **players.py** oraz **hasla.json**.
+- Uruchomić program w terminalu (poprzez **play.py**).
 
 ## Część refleksyjna
 Podczas realizacji projektu napotkałem trudności związane z optymalizacją kodu. Podzielenie programu na mniejsze funkcje, zwłaszcza w funkcji play_round(), prowadziło do problemów z działaniem programu. Ponadto próbowałem korzystać z wątków zaimplementowanych w Pythonie (Threads), aby symulować odliczanie countdown() oraz odkrywanie losowych liter reveal_letters() w rundzie finałowej, lecz wątki nakładały się na siebie w jednej linii, nie mogłem znaleźć rozwiązania dla mojego problemu w Internecie, dlatego zrezygnowałem z tej części programu. Rozważałem również wykorzystanie klas w szerszym zakresie, ale nie przyszły mi do głowy żadne pomysły, jak mógłbym to zaimplementować. Ponadto jako, że gra sama w sobie jest wzorowana na polskiej wersji, to mimo to i tak programowałem po angielsku. Wnioski z realizacji projektu są takie, że muszę jeszcze pracować nad optymalizacją kodu. Chciałbym w tej części podziękować prowadzącym przedmiot oraz projektowi za możliwość przetestowania moich umiejętności w ten sposób.

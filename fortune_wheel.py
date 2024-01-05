@@ -1,8 +1,8 @@
+from players import Player, WordAndCategory
 import random
 import time
 import os
 import json
-from players import Player, WordAndCategory
 
 
 def clear_terminal():
@@ -58,7 +58,7 @@ def introduction():
             print_fences()
             player_name = input(f"Graczu numer {i+1}, podaj swoje imię: ")
             clear_terminal()
-            if player_name.strip():
+            if player_name.strip() and 0 < len(player_name) < 20:
                 if player_name in names:
                     print("To imię jest już używane. Dodajemy indeks.")
                     name_count = 1
@@ -81,8 +81,8 @@ def introduction():
                 clear_terminal()
                 print("Proszę wprowadzić imię.")
     clear_terminal()
-    introduction = f"Witam was: {', '.join(names)}\n"
-    print(introduction + "Zaczynamy grę!")
+    introduction_message = f"Witam was: {', '.join(names)}\n"
+    print(introduction_message + "Zaczynamy grę!")
 
     return players
 
@@ -90,12 +90,15 @@ def introduction():
 def load_from_json():
     """
     Loads passwords and categories from json file.
+    Finds current directory path.
     Expects json file format.
     Json file should be nested in the same directory as program itself.
     Returns list of all WordAndCategory instances.
     """
     word_and_category_list = []
-    with open('hasla.json', 'r', encoding='utf-8') as f:
+    directory_path = os.path.dirname(__file__)
+    file_path = os.path.join(directory_path, 'passwords.json')
+    with open(file_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
         for objects in data['kategorie_i_hasla']:
             category = objects['kategoria']
@@ -306,10 +309,8 @@ def play_round(list_of_words_and_categ, players):
                             break
                         else:
                             player.add_points(3000)
-                            print("Gratulacje, udało ci się zdobyć 3000 zł !")
-                            active_player = (active_player + 1) % len(players)
-                            player = players[active_player]
                             choice = 3000
+                            print("Gratulacje, udało ci się zdobyć 3000 zł !")
                             time.sleep(2)
                             break
                     elif decision == '2':
@@ -363,6 +364,7 @@ def play_round(list_of_words_and_categ, players):
                     player = players[active_player]
                     break
             else:
+                clear_terminal()
                 print("Podana wartość nie jest spółgłoską, spróbuj ponownie.")
                 continue
 
@@ -422,6 +424,7 @@ def play_round(list_of_words_and_categ, players):
                                 player = players[active_player]
                                 break
                         else:
+                            lenght = len(players)
                             print("Wybrana samogłoska nie "
                                   "znajduje się w haśle.")
                             active_player = (active_player + 1) % lenght
